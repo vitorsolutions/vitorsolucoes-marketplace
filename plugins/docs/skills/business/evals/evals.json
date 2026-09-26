@@ -1,0 +1,51 @@
+{
+  "skill_name": "business",
+  "evals": [
+    {
+      "id": 0,
+      "name": "visao-diretoria",
+      "prompt": "Preciso apresentar esse projeto (C:\\repositories\\Acme.Integracao) para a diretoria da loja, que não entende nada de programação. Pode gerar uma documentação de negócio explicando o que esse sistema faz, quais regras ele segue e com quem ele se comunica?",
+      "expected_output": "Documentação markdown organizada por domínio de negócio, cobrindo propósito do sistema, regras de negócio e as integrações externas com o parceiro — tudo em linguagem de negócio, sem código, caminhos de arquivo, nomes de classes ou tabelas técnicas.",
+      "files": [],
+      "assertions": [
+        "Nenhum arquivo de saída contém blocos de código cercados por três crases (exceto diagramas Mermaid).",
+        "Nenhum arquivo de saída contém tabelas técnicas em formato markdown (linhas com múltiplos '|' formando grade de dados).",
+        "Nenhum arquivo de saída menciona caminhos de arquivo, nomes de classes/métodos/namespaces do código-fonte (ex: sufixos como Service, Repository, Validator, extensões .cs, namespaces do projeto, nomes de enums de status).",
+        "A documentação está organizada em múltiplos arquivos por domínio/área de negócio, não um único arquivo monolítico.",
+        "Existe uma seção de glossário definindo termos de negócio em linguagem simples (não como tabela).",
+        "As regras de negócio são descritas como frases em linguagem simples, não como pseudocódigo ou condições técnicas.",
+        "O documento responde explicitamente 'com quem o sistema se comunica', nomeando as contrapartes de negócio em termos de propósito, sem citar SDKs ou classes técnicas de integração."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "fluxo-vendas-compliance",
+      "prompt": "O time de compliance precisa entender como funciona o fluxo de sincronização de vendas entre a loja e o parceiro nesse repositório (C:\\repositories\\Acme.Integracao), incluindo as regras de validação aplicadas. Documenta isso de um jeito que eles consigam ler sem saber programar.",
+      "expected_output": "Documentação markdown focada no fluxo de sincronização de vendas, descrito passo a passo em linguagem de negócio, com as regras de validação traduzidas para políticas em prosa, sem código nem tabelas técnicas.",
+      "files": [],
+      "assertions": [
+        "Nenhum arquivo de saída contém blocos de código cercados por três crases (exceto diagramas Mermaid).",
+        "Nenhum arquivo de saída contém tabelas técnicas em formato markdown (linhas com múltiplos '|' formando grade de dados).",
+        "Nenhum arquivo de saída menciona caminhos de arquivo, nomes de classes/métodos/namespaces do código-fonte (ex: sufixos como Service, Repository, Validator, extensões .cs, namespaces do projeto).",
+        "As regras de validação de vendas são descritas como frases em linguagem simples, não como pseudocódigo ou condições técnicas.",
+        "O fluxo de sincronização de uma venda é descrito passo a passo (da captura até o envio/confirmação com o parceiro), incluindo o que acontece em caso de erro ou rejeição.",
+        "Existe uma seção de glossário definindo termos de negócio relevantes ao fluxo de vendas (ex: status de integração), em linguagem simples e não como tabela."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "onboarding-analista-negocio",
+      "prompt": "Um analista de negócio novo vai começar a acompanhar o projeto em C:\\repositories\\Acme.Integracao e ele não é técnico. Cria uma documentação que explique os processos e integrações do sistema pra ele se situar rápido.",
+      "expected_output": "Documentação markdown de visão geral, organizada por domínio, cobrindo processos e integrações externas em linguagem acessível a um leitor não-técnico, sem código nem tabelas técnicas.",
+      "files": [],
+      "assertions": [
+        "Nenhum arquivo de saída contém blocos de código cercados por três crases (exceto diagramas Mermaid).",
+        "Nenhum arquivo de saída contém tabelas técnicas em formato markdown (linhas com múltiplos '|' formando grade de dados).",
+        "Nenhum arquivo de saída menciona caminhos de arquivo, nomes de classes/métodos/namespaces do código-fonte.",
+        "A documentação está organizada em múltiplos arquivos por domínio/área de negócio, com um arquivo de índice/visão geral.",
+        "O documento cobre tanto processos de negócio (fluxos) quanto integrações externas, permitindo que alguém novo entenda rapidamente do que se trata o projeto sem precisar ler código.",
+        "Existe uma seção de glossário definindo termos de negócio em linguagem simples (não como tabela)."
+      ]
+    }
+  ]
+}

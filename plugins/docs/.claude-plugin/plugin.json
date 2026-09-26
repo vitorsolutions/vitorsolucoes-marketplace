@@ -1,0 +1,6 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "Documentation plugin — business-facing documentation generated from a source code repository, plus architecture and product design documents (ADR, PRD, TRD), each following a fixed template, in the repository where the skill is invoked.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}

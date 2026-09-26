@@ -1,0 +1,46 @@
+{
+  "skill_name": "minimal-api-scaffold",
+  "evals": [
+    {
+      "id": 0,
+      "name": "new-project-with-postgres-and-jwt",
+      "prompt": "I need to create a new Minimal API project at C:\\dev\\sandbox\\PedidosApi. It'll use PostgreSQL as the database and JWT authentication. API documentation can just be the native .NET one, no Swagger.",
+      "expected_output": "A new ASP.NET Core Minimal API project created at the given path via the dotnet CLI, with EF Core + Npgsql configured, JWT bearer authentication wired in, endpoints organized into extension methods instead of inline in Program.cs, and a final dotnet build confirmed to succeed before the task is reported as done.",
+      "files": [],
+      "assertions": [
+        "The skill runs a real dotnet SDK check (dotnet --version or dotnet --list-sdks) before generating anything.",
+        "The skill does not ask about database/auth/documentation choices that the user already answered in the prompt (Postgres, JWT, native docs) — it proceeds directly to generation for those, at most confirming understanding.",
+        "The generated project includes an EF Core provider package for PostgreSQL (e.g. Npgsql.EntityFrameworkCore.PostgreSQL) referenced in the .csproj.",
+        "Program.cs delegates endpoint registration to extension methods rather than defining every route inline.",
+        "The skill runs dotnet build against the generated project and reports the build result explicitly, not just that files were created.",
+        "No real client, company, or internal hostname appears anywhere in generated code, comments, or connection strings — only placeholder values."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "sdk-missing-guidance-only",
+      "prompt": "I want to create a new Minimal API called CatalogoApi, but I think I don't have the .NET SDK installed on this machine.",
+      "expected_output": "The skill checks for the .NET SDK, confirms it is missing, and asks the user whether they want setup guidance. If the user says yes, it provides OS-appropriate step-by-step installation instructions without executing any installation command itself, and does not proceed to generate the project until the user confirms the SDK is ready.",
+      "files": [],
+      "assertions": [
+        "The skill explicitly runs or references a real dotnet SDK detection command before concluding it is missing.",
+        "The skill asks the user for confirmation before giving installation guidance, rather than dumping instructions unprompted.",
+        "The installation guidance is specific to an operating system rather than a single generic link, and does not include the skill running an install/configure command on the user's behalf.",
+        "The skill does not proceed to project generation (dotnet new) within this same response, since the SDK was reported missing."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "simple-project-no-database",
+      "prompt": "Create a simple Minimal API project called HealthCheckApi, no database, no authentication, and with Scalar for API documentation. You can generate it in the current directory.",
+      "expected_output": "A minimal, dependency-light ASP.NET Core Minimal API project generated via dotnet CLI with Scalar wired in for API documentation, no database or auth packages added, endpoints organized via extension methods, and a successful dotnet build confirmed at the end.",
+      "files": [],
+      "assertions": [
+        "No EF Core or database provider package is added, consistent with the user's 'no database' answer.",
+        "No authentication/authorization middleware or package is added, consistent with the user's 'no auth' answer.",
+        "A Scalar package/middleware is referenced for API documentation instead of Swashbuckle or no documentation at all.",
+        "The skill runs dotnet build and reports the outcome before considering the task complete."
+      ]
+    }
+  ]
+}

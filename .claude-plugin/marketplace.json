@@ -1,0 +1,10 @@
+{
+  "name": "vitor-solucoes",
+  "owner": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" },
+  "plugins": [
+    { "name": "docs", "source": "./plugins/docs", "description": "Documentation plugin — business-facing documentation generated from a source code repository, plus architecture and product design documents (ADR, PRD, TRD), each following a fixed template." },
+    { "name": "ideation", "source": "./plugins/ideation", "description": "Ideation plugin — structured exploration of ideas and options before a decision is made, feeding downstream into the docs plugin's ADR/PRD skills once a direction is chosen." },
+    { "name": "dotnet", "source": "./plugins/dotnet", "description": "Dotnet plugin — practical skills for .NET developers to use with an AI agent, covering ASP.NET Core Minimal API scaffolding, EF Core migration safety and query performance review, observability setup, configuration/dependency auditing, and Clean Architecture auditing plus automated dependency-rule guards." },
+    { "name": "ai", "source": "./plugins/ai", "description": "AI plugin — meta-skills for engineering the AI tooling itself, starting with agent-creator: creating, reviewing, and refactoring Claude Code agents/subagents with the same rigor skill-creator brings to skills." }
+  ]
+}

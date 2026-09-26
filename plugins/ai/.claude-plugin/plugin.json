@@ -1,0 +1,6 @@
+{
+  "name": "ai",
+  "version": "1.0.0",
+  "description": "AI plugin — meta-skills for engineering the AI tooling itself (Claude Code agents/subagents today, with room to grow), as opposed to skills that produce project deliverables like docs or .NET code.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}

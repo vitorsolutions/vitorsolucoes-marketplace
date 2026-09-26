@@ -1,0 +1,6 @@
+{
+  "name": "dotnet",
+  "version": "1.0.0",
+  "description": "Dotnet plugin — practical skills for .NET developers to use with an AI agent, covering ASP.NET Core Minimal API scaffolding, EF Core migration safety and query performance review, observability setup, configuration/dependency auditing, and Clean Architecture auditing plus automated dependency-rule guards.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}

@@ -1,0 +1,32 @@
+# macOS metadata
+.DS_Store
+
+# Windows / NTFS metadata
+*:Zone.Identifier
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python (in case a skill script uses it)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Catalog site dependencies and build artifacts (catalog/ also has its own .gitignore)
+catalog/node_modules/
+catalog/dist/
+catalog/.astro/
+catalog/public/pagefind/
+/.playwright-mcp

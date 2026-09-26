@@ -1,0 +1,6 @@
+{
+  "name": "ideation",
+  "version": "1.0.0",
+  "description": "Ideation plugin — structured exploration of ideas and options before a decision is made, feeding downstream into the docs plugin's ADR/PRD skills once a direction is chosen.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}
