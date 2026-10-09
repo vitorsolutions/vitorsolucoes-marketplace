@@ -123,3 +123,13 @@ Any new .NET-focused skill belongs to this plugin instead of a new domain.
 
 Any new AI-tooling/meta skill (agent engineering, and similar meta-concerns as they arise)
 belongs to this plugin instead of a new domain.
+
+
+- **security** — security investigation and protective guidance. See `plugins/security/`. Skills:
+  - `job-scam-investigator` — evidence-led assessment of job advertisements, recruiter messages,
+    and hiring processes. Uses passive independent verification, separate risk/confidence labels,
+    exposure triage, and an optional offline Python indicator extractor. Never contacts suspects,
+    executes suspect files, probes infrastructure, or publishes personal evidence.
+
+New security investigation skills belong to this domain. Run the helper tests from
+`plugins/security/skills/job-scam-investigator` with `python -m unittest discover -s tests -v`.

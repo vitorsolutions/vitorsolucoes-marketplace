@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin%20Marketplace-5A67D8?style=flat-square)](https://github.com/vitorsolutions/vitorsolucoes-marketplace)
-[![Plugins](https://img.shields.io/badge/plugins-4-2563eb?style=flat-square)](./plugins)
-[![Skills](https://img.shields.io/badge/skills-14-2563eb?style=flat-square)](./plugins)
+[![Plugins](https://img.shields.io/badge/plugins-5-2563eb?style=flat-square)](./plugins)
+[![Skills](https://img.shields.io/badge/skills-15-2563eb?style=flat-square)](./plugins)
 
 A [Claude Code](https://claude.com/claude-code) plugin marketplace maintained by **Vitor
 Soluções**, following the official plugin marketplace format. Each domain is an independent
@@ -22,7 +22,8 @@ with nothing duplicated by hand.
 │   ├── docs/                         # documentation domain: business docs, ADR, PRD, TRD
 │   ├── ideation/                     # pre-decision exploration domain: brainstorm
 │   ├── dotnet/                       # .NET domain: scaffolding, EF Core, observability, audits
-│   └── ai/                           # AI-tooling domain: agent-creator
+│   ├── ai/                           # AI-tooling domain: agent-creator
+│   └── security/                     # job-offer fraud investigation
 ├── catalog/                          # Astro catalog site (pure projection of the repo)
 ├── LICENSE
 ├── CLAUDE.md                         # repo guide for Claude Code
@@ -37,6 +38,8 @@ with nothing duplicated by hand.
 | [`ideation`](./plugins/ideation) | Pre-decision exploration domain. Bundles `brainstorm` (explores multiple distinct ideas or options around a topic before any decision has been made, without writing files — once an idea is settled, it feeds into the `docs` plugin's `adr` or `prd` skill). |
 | [`dotnet`](./plugins/dotnet) | .NET domain. Bundles `minimal-api-scaffold` (scaffolds a brand-new ASP.NET Core Minimal API project via the `dotnet` CLI, following current Microsoft and community best practices for the SDK version actually installed), `ef-migration-safety-review` (static-analysis review of the latest EF Core migration for operational risk — missing defaults, irreversible drops, disguised renames, incomplete rollback — before it's applied to a real database), `aspnet-observability-setup` (adds vendor-neutral logging/tracing/metrics via OpenTelemetry to an existing ASP.NET Core project, detecting and completing only what's missing), `ef-core-query-performance-review` (evidence-graded diagnosis of EF Core/LINQ query performance the user points to, comparing implementations or confirming hypotheses like N+1 via a disposable SQLite in-memory context when static analysis isn't enough), `appsettings-secrets-audit` (audits appsettings*.json/launchSettings.json for hardcoded secrets, cross-referenced against git tracking status so real exposure is never confused with a gitignored placeholder), `nuget-dependency-audit` (audits NuGet dependencies for known vulnerabilities, deprecated packages, and outdated versions via the dotnet CLI's native checks — no external API calls), `clean-architecture-audit` (audits an existing solution's real project-reference graph against the Clean Architecture dependency rule), and `netarchtest-guard-scaffold` (generates a NetArchTest-based test project that fails the build automatically on a layering regression). |
 | [`ai`](./plugins/ai) | AI-tooling domain. Bundles `agent-creator` (engineers Claude Code agents/subagents — creating, reviewing, and refactoring them — starting from whether an agent is even the right mechanism versus project instructions, a skill, a command, a hook, an MCP tool, or an existing agent, then covering responsibility scope, delegation description quality, least-privilege tools, model choice, autonomy, and known anti-patterns when one is warranted). |
+
+| [`security`](./plugins/security) | Security domain. Bundles `job-scam-investigator` for evidence-led job-offer risk assessment, passive verification, exposure triage, and offline indicator extraction. |
 
 ## Installing skills
 
@@ -61,6 +64,10 @@ npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/dotnet/skills --
 
 ```bash
 npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/ai/skills --full-depth
+```
+
+```bash
+npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/security/skills --full-depth
 ```
 
 Or install one specific skill by name:

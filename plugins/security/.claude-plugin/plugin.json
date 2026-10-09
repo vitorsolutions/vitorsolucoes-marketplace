@@ -1,0 +1,9 @@
+{
+  "name": "security",
+  "version": "0.1.1",
+  "description": "Security plugin — evidence-led investigation of potentially fraudulent job offers, with passive verification, exposure triage, and offline indicator extraction.",
+  "author": {
+    "name": "Vitor Soluções",
+    "email": "contato@vitorsolucoes.com"
+  }
+}
