@@ -1,0 +1,54 @@
+{
+  "skill_name": "harness-setup",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-bare-repository",
+      "prompt": "Prepara este repositório para trabalhar com agentes de codificação. Não sei por onde começar.",
+      "setup": "Fictional solution 'Acme.Orders' with Domain, Application, Api and a test project. Template defaults only: no Directory.Build.props, no .editorconfig, no AGENTS.md, no .claude folder, no CI file.",
+      "expected_output": "Detects .NET, reads effective build properties with the read-only readout and does not run a build without asking. Reports a layer table with evidence: checks layer missing or partial, agent guide missing, permissions and hooks missing, proof missing, architecture layer applicable because there are several projects. Produces an ordered plan with skill names, reasons, mode, risk and dependencies, with the guide after checks and tests, hooks after the guide and proof last. Changes no file. Asks which step to start with and recommends one."
+    },
+    {
+      "id": 2,
+      "name": "legacy-many-warnings",
+      "prompt": "Assess my .NET repo for AI agents.",
+      "setup": "Fictional solution with security analyzers on and 150 existing warnings; the build exits 0 because warnings do not fail it. A guide file exists.",
+      "expected_output": "Classifies the checks layer as partial, not present, because warnings do not fail. Recommends gradual mode and says the baseline should be measured by the sensors skill. Does not claim to know the warning count unless a build was run with the user's permission. Does not apply anything."
+    },
+    {
+      "id": 3,
+      "name": "python-bypass-and-no-proof",
+      "prompt": "O que falta configurar neste projeto Python para o agente funcionar bem?",
+      "setup": "Fictional repository 'acme-billing' using uv, with ruff and mypy configured, a pytest suite, and a CI script that runs 'ruff check . || true'. An AGENTS.md exists and its commands pass.",
+      "expected_output": "Detects Python and reads the configuration in effect. Classifies the checks layer as partial because the command is bypassed, the guide as present, and the proof layer as missing even though the checks look configured. Marks the architecture layer missing or not applicable with a reason, noting that Python exposes no project graph. Plans the sensors step and then proof. Does not install tools and marks anything depending on a missing tool as unknown."
+    },
+    {
+      "id": 4,
+      "name": "everything-present",
+      "prompt": "Check the harness of this repository and tell me what to do next.",
+      "setup": "Fictional .NET repository where every layer exists and works, and a probe result from last week is recorded.",
+      "expected_output": "Reports all layers as present with evidence and does not invent steps. Says the proof is older than the last tool or configuration change only if that is true. States that completeness does not make the code correct or secure. Recommends nothing to build."
+    },
+    {
+      "id": 5,
+      "name": "user-picks-a-step",
+      "prompt": "Ok, vamos começar pelo passo das verificações.",
+      "setup": "Continuation of a plan produced earlier in the conversation for a fictional .NET repository.",
+      "expected_output": "Hands off to the sensors skill by name and lets it run its own workflow. Does not repeat its questions and does not make the changes itself. If the skill is not available, says so, describes what the step would do, and stops."
+    },
+    {
+      "id": 6,
+      "name": "mixed-stack",
+      "prompt": "Prepare this repo for agents.",
+      "setup": "Fictional repository 'acme-platform' with a .NET API under one folder and a Python data service under another, each with its own configuration.",
+      "expected_output": "Detects both stacks, assesses each separately, and produces one plan per stack. Does not merge them into a single table that hides the differences."
+    },
+    {
+      "id": 7,
+      "name": "unsupported-stack",
+      "prompt": "Plan the agent harness for this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, explains the layers in concept, and stops without writing any file."
+    }
+  ]
+}
