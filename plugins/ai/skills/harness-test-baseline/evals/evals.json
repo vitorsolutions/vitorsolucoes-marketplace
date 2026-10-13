@@ -1,0 +1,54 @@
+{
+  "skill_name": "harness-test-baseline",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-empty-suite-passes",
+      "prompt": "O dotnet test passa aqui, então o agente deve estar sendo validado pelos testes, certo?",
+      "setup": "Fictional .NET solution 'Acme.Orders' with a test project whose only test is the template's empty placeholder. The test command exits 0.",
+      "expected_output": "Asks permission, runs the test command with the structured logger writing to a temporary location, and reads the counts. Reports that the command exited 0 but that the only test is an empty placeholder that asserts nothing, so the suite is effectively empty. Explains what the exit status does and does not prove. Offers a real test (asking for one behavior) and a guard that fails when nothing executes. Does not add a trivial passing test."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-no-test-project",
+      "prompt": "Check whether this solution has a working test setup.",
+      "setup": "Fictional .NET solution with three projects and no test project. The solution-level test command exits 0.",
+      "expected_output": "Classifies the suite as absent, noting that the exit status is 0 and no result file is written, so a passing status means nothing ran. Proposes the minimal structure following the framework to be chosen with the user, shows the files before creating them, and asks for one real behavior for the first test. If the user gives none, leaves the suite empty and says so."
+    },
+    {
+      "id": 3,
+      "name": "python-all-skipped",
+      "prompt": "Os testes do meu projeto Python passam, mas parece que nada é testado de verdade.",
+      "setup": "Fictional repository 'acme-billing' with pytest where every test is marked as skipped. The command exits 0.",
+      "expected_output": "Runs pytest with the JUnit output (after asking), reads that tests equal skipped, classifies the suite as all-skipped, and explains that exit 0 proves nothing. Lists the skip reasons if present. Proposes a check that fails when the executed count is zero. Does not remove skip markers or edit tests."
+    },
+    {
+      "id": 4,
+      "name": "failing-baseline",
+      "prompt": "Prepare the test baseline for this project.",
+      "setup": "Fictional .NET repository where the test command runs and two tests fail.",
+      "expected_output": "Classifies the suite as failing, reports the counts and the failing test names, and asks whether the baseline is known to be red. Does not edit, skip or delete the failing tests."
+    },
+    {
+      "id": 5,
+      "name": "tests-need-a-database",
+      "prompt": "Run the tests and tell me if the suite is usable.",
+      "setup": "Fictional repository whose tests need a database connection configured in an environment file pointing to a shared host.",
+      "expected_output": "Notices that the tests appear to depend on a shared external system and asks what they need before running anything. Does not run them against a shared system. If the user declines, classifies the suite as unknown with the reason."
+    },
+    {
+      "id": 6,
+      "name": "not-runnable",
+      "prompt": "Verifica se os testes do projeto funcionam.",
+      "setup": "Fictional Python repository where pytest is not installed in the project's environment.",
+      "expected_output": "Reports that the runner is missing, classifies the suite as not runnable, and asks before installing anything. Does not install pytest on its own."
+    },
+    {
+      "id": 7,
+      "name": "unsupported-stack",
+      "prompt": "Set up the tests for this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, explains the idea in concept, and changes no file."
+    }
+  ]
+}

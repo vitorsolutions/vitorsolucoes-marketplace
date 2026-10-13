@@ -1,0 +1,47 @@
+{
+  "skill_name": "harness-reproducibility",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-nothing-pinned",
+      "prompt": "O build do agente às vezes falha e na minha máquina passa. Quero que as versões sejam sempre as mesmas.",
+      "setup": "Fictional .NET solution 'Acme.Orders' with three projects, no global.json, package versions with a Version attribute in each project file, no lock files. CI exists and runs a plain restore.",
+      "expected_output": "Measures three layers: toolchain floating, direct dependencies scattered, no lock file. Reads the SDK version in use today and pins that one, not another. Presents options with trade-offs for the roll-forward policy, for central package management (and the need to reconcile differing versions) and for lock files. Applies one layer at a time with confirmation, asks before restore, and verifies with the locked restore command only. States that CI should use the locked command and that the mismatch failure path was not exercised."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-lock-ignored-by-git",
+      "prompt": "Added lock files but my teammates still get different versions.",
+      "setup": "Fictional .NET repository where packages.lock.json files exist locally but a .gitignore rule excludes them, and CI uses a plain restore.",
+      "expected_output": "Finds with the git commands that the lock files are ignored and untracked, and that CI does not use locked mode, and reports both as the reason. Proposes removing the ignore rule and using the locked restore in CI, with approval. Does not regenerate the lock files without being asked."
+    },
+    {
+      "id": 3,
+      "name": "python-frozen-is-not-a-check",
+      "prompt": "Verify that our Python lock file is respected in CI.",
+      "setup": "Fictional repository 'acme-billing' using uv with a uv.lock. The CI script runs the sync command with the frozen option.",
+      "expected_output": "Explains that the frozen option installs from the lock without checking that it matches pyproject.toml, so it does not enforce anything. Proposes the lock check command and the locked sync command and explains their exit statuses. Does not run any command that rewrites the lock to verify. Edits nothing without approval."
+    },
+    {
+      "id": 4,
+      "name": "python-poetry-not-run",
+      "prompt": "Make dependencies reproducible in this Python project.",
+      "setup": "Fictional repository using poetry with a poetry.lock tracked by git and no pinned interpreter file.",
+      "expected_output": "Identifies poetry from the files. Says the poetry commands come from documentation and were not run in the reference tests, and asks to confirm the installed version before relying on the consistency check. Proposes pinning the interpreter with the user's choice between a compatibility bound and an exact pin file. Does not run commands that rewrite the lock."
+    },
+    {
+      "id": 5,
+      "name": "conflicting-package-versions",
+      "prompt": "Centraliza as versões dos pacotes NuGet.",
+      "setup": "Fictional .NET solution where two projects use different versions of the same logging package.",
+      "expected_output": "Finds the conflict and asks which version to use, explaining that one project will resolve a different version afterwards. Creates the central file with approval, removes version attributes, then builds and tests (asking first) and reports the result. Notes that a leftover version attribute makes restore fail."
+    },
+    {
+      "id": 6,
+      "name": "unsupported-stack",
+      "prompt": "Pin dependency versions in this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, explains the layers in concept, and changes no file."
+    }
+  ]
+}

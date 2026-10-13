@@ -1,0 +1,61 @@
+{
+  "skill_name": "harness-architecture-guard",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-layers-clean",
+      "prompt": "Quero impedir que o agente faça o Domain depender da Infrastructure ou de HttpClient. Cria os testes de arquitetura.",
+      "setup": "Fictional .NET solution 'Acme.Orders' with Domain, Application, Infrastructure and Api projects. Application references Domain, Infrastructure references both. Nothing breaks the intended rules today. xUnit is used by the existing test project.",
+      "expected_output": "Detects .NET, lists projects and project references and builds the direction map from the reference graph, not from names. Confirms the proposed rules with the user, one reason each. Runs the rules read-only first and finds no violations. Creates a new test project (never editing production code), referencing each layer, loading assemblies by name, with the scan-not-empty guard, the forbidden-namespace-exists guard, a positive control and the rules. Asks before adding the package. Runs the guard and checks the executed count from the TRX. Proves each rule by planting a violation in a throwaway copy and shows the failing type name, then confirms the real repository is untouched. Says which command to add to the definition of done."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-existing-violations",
+      "prompt": "Add architecture tests, I know the domain already uses an HTTP client in one place.",
+      "setup": "Fictional .NET solution where one domain type already uses an HTTP client type.",
+      "expected_output": "Measures the existing violation read-only, names the type, and offers the known-violations list or fixing first. With the list: the type is recorded by full name, a new violation fails, and a listed type that no longer fails also fails so the list can only shrink. Does not edit the domain code to fix it."
+    },
+    {
+      "id": 3,
+      "name": "dotnet-typo-in-forbidden-name",
+      "prompt": "I wrote a rule that the domain must not depend on the infrastucture namespace and it passes. Is it working?",
+      "setup": "Fictional .NET architecture test whose forbidden namespace name is misspelled so it matches nothing.",
+      "expected_output": "Explains that a rule on a name that matches nothing passes silently and that matching is by namespace segment, so a misspelled or partial name never matches. Proposes the existence guard for names that belong to the solution and the planted-violation proof, and shows that the guard would have failed. Does not claim the rule works."
+    },
+    {
+      "id": 4,
+      "name": "python-layers",
+      "prompt": "Garante que o pacote domain não importe infra nem bibliotecas de rede.",
+      "setup": "Fictional Python package 'acme_orders' with domain, app and infra sub-packages, configured in pyproject.toml, no import contracts yet. uv is the package manager.",
+      "expected_output": "Detects Python, reads the package structure, asks the user for the intended direction instead of inferring it from names, and proposes a layers contract plus a forbidden contract. Asks before adding the tool as a development dependency. Notes that external forbidden modules need the option that includes external packages. Merges the configuration into pyproject.toml. Runs the command, checks the contracts count equals what was written, proves each contract by planting a module in a throwaway copy, and deletes the copy."
+    },
+    {
+      "id": 5,
+      "name": "python-ignore-imports-stale",
+      "prompt": "The guard started failing with 'No matches for ignored import'. What does it mean?",
+      "setup": "Fictional Python repository with a contract that has an ignore list containing an import that was refactored away.",
+      "expected_output": "Explains that the listed import no longer exists and that this is intended: the list can only shrink, so the entry must be removed in the change that fixed the breach. Does not touch other entries."
+    },
+    {
+      "id": 6,
+      "name": "single-module",
+      "prompt": "Add architecture tests to this project.",
+      "setup": "Fictional .NET repository with a single project and no layering.",
+      "expected_output": "Reports not applicable with the reason, because there is no dependency direction between modules to protect, and writes no file. May ask whether an inner module must stay free of a library, and proceeds only if so."
+    },
+    {
+      "id": 7,
+      "name": "business-logic-in-the-wrong-place",
+      "prompt": "Will this catch business rules written inside the controllers?",
+      "setup": "Fictional layered .NET repository with a guard installed.",
+      "expected_output": "Answers that the guard sees dependencies, not intent: business logic placed in the wrong layer without a forbidden dependency is invisible to it. Suggests specifications and tests for behavior. Does not overclaim."
+    },
+    {
+      "id": 8,
+      "name": "unsupported-stack",
+      "prompt": "Enforce our layering with tests.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, explains the idea in concept, and changes no file."
+    }
+  ]
+}

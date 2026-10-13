@@ -27,8 +27,9 @@ content.
 ## Skill format
 
 `SKILL.md` with minimal frontmatter (`name`, `description`). Version/author live in `plugin.json`
-and `marketplace.json`. The documentation shown in the catalog comes from `docs/<skill>.md` (the
-first paragraph becomes the card blurb; the whole file becomes the detail page).
+and `marketplace.json`. The documentation shown in the catalog comes from `docs/<skill>.md`: it
+must start with an H1 (`# Title`); the first paragraph after it becomes the card blurb, and the
+whole file becomes the detail page.
 
 ## Rules
 
@@ -120,6 +121,26 @@ Any new .NET-focused skill belongs to this plugin instead of a new domain.
     with other agents, and common anti-patterns (overly generic agents, duplicated
     responsibilities, duplicated skills, excessive tool grants, circular delegation, and
     more).
+  - `harness-*` — twelve generic skills that prepare a repository for AI coding agents, one per
+    concern, each with per-stack packs under `references/stacks/` (.NET and Python today; a new
+    language is one new file per skill). Every skill works on its own:
+    - `harness-setup` — read-only assessment of the repository and an ordered adoption plan that
+      hands off to the others.
+    - `harness-reproducibility` — pinned toolchain and locked dependencies.
+    - `harness-sensors` — makes correctness, type, and security checks fail the build
+      (strict or gradual).
+    - `harness-code-style` — style verified by a tool that fails on violation.
+    - `harness-banned-apis` — "do not use X, use Y" policies as failing checks.
+    - `harness-test-baseline` — checks that the test command means something (not empty, not
+      all skipped).
+    - `harness-architecture-guard` — dependency rules between modules checked automatically.
+    - `harness-agent-guide` — accurate agent instructions and a definition of done.
+    - `harness-permissions` — project-level allow/ask/deny rules for the agent.
+    - `harness-hooks` — creates run-time hooks (done criteria, protected files, suppressions,
+      risky commands); ships a tested stdlib-only script.
+    - `harness-ci-pipeline` — CI that repeats the local definition of done and keeps evidence
+      (GitHub Actions and Azure Pipelines).
+    - `harness-sensor-probe` — proves the checks fire by planting defects in a throwaway copy.
 
 Any new AI-tooling/meta skill (agent engineering, and similar meta-concerns as they arise)
 belongs to this plugin instead of a new domain.

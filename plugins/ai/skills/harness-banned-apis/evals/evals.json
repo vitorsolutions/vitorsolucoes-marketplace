@@ -1,0 +1,54 @@
+{
+  "skill_name": "harness-banned-apis",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-time-and-raw-sql",
+      "prompt": "Quero proibir DateTime.Now e DateTime.UtcNow e também SQL cru do EF Core neste projeto. O agente tem usado essas APIs.",
+      "setup": "Fictional solution 'Acme.Orders' on .NET 10 with EF Core relational referenced. No banned API package. Two existing uses of DateTime.UtcNow and none of the raw SQL methods. Warnings do not fail the build.",
+      "expected_output": "Detects .NET and that the mechanism is not installed. Proposes policies from the catalog with alternative messages, asks for confirmation. Searches existing uses and labels the count approximate, then states that the compiler diagnostic count is exact. Explains the default severity is a warning and offers to set the ban diagnostic to error, and because there are two existing uses, offers gradual options and asks. Wires the package and the policy file including the additional-files item. Validates every entry, including one overload per raw SQL line, and reports any silent entry. Does not fix the existing uses."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-silent-entry",
+      "prompt": "Added a ban for Console.WriteLine in BannedSymbols.txt but the build never complains.",
+      "setup": "Fictional .NET project where the policy file uses the language keyword 'string' in the parameter list, and the file is wired as an additional file.",
+      "expected_output": "Identifies the entry as silent and explains the likely cause: parameter types must use full documentation names such as System.String. Proposes the corrected entry, validates it against a real use, and does not conclude the mechanism is broken without checking that another entry fires."
+    },
+    {
+      "id": 3,
+      "name": "dotnet-not-wired",
+      "prompt": "The package is installed and BannedSymbols.txt exists, but nothing is reported for DateTime.UtcNow.",
+      "setup": "Fictional .NET project with the package reference and the policy file present, but no additional-files item including the file.",
+      "expected_output": "Finds the missing wiring as the cause, shows the line to add, applies it with approval, and validates that at least one entry now fires. Notes that a wired file that does not exist breaks the build."
+    },
+    {
+      "id": 4,
+      "name": "python-ruff-banned-api",
+      "prompt": "Proíbe datetime.utcnow neste serviço Python e diz o que usar no lugar.",
+      "setup": "Fictional repository 'acme-billing' using ruff configured in pyproject.toml, Python 3.13. One existing call to datetime.datetime.utcnow().",
+      "expected_output": "Detects ruff and reads which configuration file is in effect. Adds the banned-api table and selects the rule without replacing existing selections. Counts the existing use exactly with the lint output. Offers gradual options for the existing use and asks. Validates the entry. Does not add suppression markers without asking."
+    },
+    {
+      "id": 5,
+      "name": "python-no-ruff",
+      "prompt": "Ban a module in this Python project.",
+      "setup": "Fictional repository that uses flake8 and no ruff configuration.",
+      "expected_output": "Says this pack depends on ruff, explains the idea in concept, and does not add ruff without asking. Changes no file until the user decides."
+    },
+    {
+      "id": 6,
+      "name": "generated-code-uses-banned-symbol",
+      "prompt": "Add the clock ban to this .NET solution.",
+      "setup": "Fictional .NET solution where a code-generation tool writes files that call DateTime.UtcNow.",
+      "expected_output": "Finds uses in generated files through the compiler diagnostics, reports them, does not edit the generated files, and offers a path-scoped severity or an exclusion as options for the user to choose."
+    },
+    {
+      "id": 7,
+      "name": "unsupported-stack",
+      "prompt": "Forbid a specific API in this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, and changes no file."
+    }
+  ]
+}
