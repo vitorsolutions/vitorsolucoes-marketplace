@@ -1,0 +1,47 @@
+{
+  "skill_name": "harness-code-style",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-editorconfig-not-enforced",
+      "prompt": "Temos um .editorconfig bem completo mas o agente continua gerando código fora do nosso estilo e o build não reclama.",
+      "setup": "Fictional .NET solution 'Acme.Orders' with a detailed .editorconfig that sets several style rules to warning. EnforceCodeStyleInBuild is not set. The build exits 0 with no style diagnostics.",
+      "expected_output": "Reads the effective state and finds the property unset as the reason style is ignored by the command-line build. Runs the verify-only format command, notes the exit status 2 on drift, and lists the violated rules. Proposes enabling the property and choosing a small set of rules to set to error, so they fail without depending on failure on warning. Does not reformat anything. Confirms a rule fails by re-reading the state or running the check."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-reformat-requested",
+      "prompt": "Quero que o projeto inteiro siga o estilo. Pode formatar tudo.",
+      "setup": "Fictional .NET solution where verify-only formatting reports 140 files that would change.",
+      "expected_output": "Treats reformatting as a separate explicit step, reports the file count from verify-only output, recommends doing it in its own change and mentions ignoring that revision in blame. Waits for approval, then reformats and re-runs the check. Does not commit."
+    },
+    {
+      "id": 3,
+      "name": "python-import-order",
+      "prompt": "Make ruff check import order and formatting in this Python project and fail when they are off.",
+      "setup": "Fictional repository 'acme-billing' with ruff configured in pyproject.toml, an existing selection of rule families, and a CI script that runs the lint step as 'ruff check . || true'.",
+      "expected_output": "Reads the configuration in effect, uses extend-select (or edits the existing list) rather than replacing the selection, adds the import family, and adds the formatting check command. Finds the bypass in the CI script and reports it. Does not run fix or format commands that rewrite files."
+    },
+    {
+      "id": 4,
+      "name": "python-ruff-toml-shadows",
+      "prompt": "I added rules to pyproject.toml for ruff but nothing changed.",
+      "setup": "Fictional repository with both a ruff.toml and a ruff table in pyproject.toml.",
+      "expected_output": "Checks which configuration is in effect, explains that the ruff.toml shadows the pyproject table and they are not merged, and proposes moving the new rules to the file in effect, with approval."
+    },
+    {
+      "id": 5,
+      "name": "too-many-rules-requested",
+      "prompt": "Ativa todas as regras de estilo como erro, quanto mais melhor.",
+      "setup": "Fictional .NET solution with 600 existing style violations.",
+      "expected_output": "Pushes back on enabling a whole category at once and explains it tends to cause suppression rather than fixes. Measures drift by rule, proposes a small starting set and a gradual path, and asks the user to choose."
+    },
+    {
+      "id": 6,
+      "name": "unsupported-stack",
+      "prompt": "Enforce code style in this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, and changes no file."
+    }
+  ]
+}

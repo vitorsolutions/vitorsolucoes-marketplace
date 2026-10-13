@@ -1,0 +1,47 @@
+{
+  "skill_name": "harness-agent-guide",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-create-from-scratch",
+      "prompt": "Cria o AGENTS.md para este repositório .NET, para o agente saber como trabalhar aqui.",
+      "setup": "Fictional solution 'Acme.Orders' (slnx) with Domain, Application and a test project; Application references Domain, tests reference Application. No AGENTS.md or CLAUDE.md. Build, test and format check all exit 0. Warnings do not fail the build.",
+      "expected_output": "Detects .NET, lists projects with the solution list command and builds the direction map from project references, not from names. Runs the build, test and format commands (asking first where required) and lists only those that exited 0. Does not claim warnings fail the build and points to the sensors skill for that. Asks a few questions with skippable defaults. Offers the standard restrictions for the user to accept. Presents the draft for approval before writing, creates AGENTS.md as the single source and a CLAUDE.md that only imports it. Does not invent conventions, does not commit."
+    },
+    {
+      "id": 2,
+      "name": "reconcile-stale-guide",
+      "prompt": "Revisa o AGENTS.md do projeto, acho que está desatualizado.",
+      "setup": "Fictional repository with an AGENTS.md that mentions a project folder that was renamed, a test command that no longer exists, and a rule 'use 4 spaces' that the formatter already enforces. A new enforced analyzer setting exists that the guide does not mention.",
+      "expected_output": "Enters reconcile mode and does not overwrite the file. Reports a table with stale (renamed folder, missing command), redundant (the indentation rule already enforced by a tool) and missing (the new enforced setting) statuses, each with evidence. Proposes a patch and waits for approval."
+    },
+    {
+      "id": 3,
+      "name": "python-bypassed-command",
+      "prompt": "Gera as instruções do agente para este serviço Python.",
+      "setup": "Fictional repository 'acme-billing' using uv, ruff and mypy configured in pyproject.toml, with pytest tests. The CI script runs the lint step as 'ruff check . || true'.",
+      "expected_output": "Detects Python and the uv environment, writes commands that run through the project's runner. Does not present the bypassed lint command as a gate, reports the bypass and points to the sensors skill. Does not state a dependency direction rule because Python exposes none, and asks the user. Does not install anything. If a tool is missing, reports it as not run."
+    },
+    {
+      "id": 4,
+      "name": "existing-claude-md-with-content",
+      "prompt": "Quero que o Claude Code e outras ferramentas leiam as mesmas instruções neste repositório.",
+      "setup": "Fictional repository with a long CLAUDE.md containing project rules and no AGENTS.md.",
+      "expected_output": "Does not replace the existing CLAUDE.md. Offers two options: move the shared content to AGENTS.md and leave an import line in CLAUDE.md, or keep both and explain which one wins in practice. Waits for the user's choice. Asks which other tools need a file instead of assuming how they import."
+    },
+    {
+      "id": 5,
+      "name": "failing-baseline",
+      "prompt": "Escreve o critério de pronto do AGENTS.md para este projeto.",
+      "setup": "Fictional .NET repository where the build passes but the test command currently fails with two failing tests.",
+      "expected_output": "Runs the commands, finds that the test command exits non-zero, and reports it as failing rather than listing it as passing. Asks whether to list it in the definition of done with a note that the baseline is red, or to leave it out until fixed. Does not fix the tests."
+    },
+    {
+      "id": 6,
+      "name": "unsupported-stack",
+      "prompt": "Create the agent instructions file for this repository.",
+      "setup": "Fictional repository 'acme-gateway' written in Go, with go.mod.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, describes the guide in concept, and writes no file."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "harness-sensors",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-default-settings-warns-only",
+      "prompt": "Meu repositório é uma API .NET com camadas Domain, Application e Api, criada com os templates padrão. O build passa, mas o agente deixa passar código inseguro. Configura as verificações para que o build falhe nesses casos.",
+      "setup": "Fictional solution 'Acme.Orders' with three SDK-style projects, no Directory.Build.props, default analyzer settings, zero warnings in the baseline, one test project.",
+      "expected_output": "Detects the .NET stack. Reads the effective state with the MSBuild property readout before changing anything. Classifies Nullable, analyzers, security rules and NuGet audit as reported or off, not enforced. Proposes changes in a repository-root Directory.Build.props, one control at a time, and asks for confirmation. Re-runs the build with --no-incremental after each control and records the exit status and diagnostic codes. Raises the NuGet audit trade-off (audit warnings become errors with failure-on-warning) and asks the user instead of deciding. Does not touch global.json, does not suppress anything, does not commit."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-legacy-with-many-warnings",
+      "prompt": "Quero que o build falhe em avisos neste projeto .NET antigo. Já sei que ele tem muitos avisos hoje.",
+      "setup": "Fictional solution 'Acme.Legacy' with four SDK-style projects. The baseline build succeeds with 200+ warnings across about a dozen diagnostic codes, including nullable warnings.",
+      "expected_output": "Measures the baseline and reports the count by diagnostic code. Does not enable failure-on-warning for everything, because that would break the build immediately. Proposes gradual mode using an explicit list of codes, explains the cost of each mechanism, and asks which one to use. Does not fix the existing warnings and does not add suppressions."
+    },
+    {
+      "id": 3,
+      "name": "python-lint-bypassed-in-ci",
+      "prompt": "Set up the checks so my coding agent can't call a task done when there are security or type problems. It's a Python service.",
+      "setup": "Fictional repository 'acme-billing' with pyproject.toml containing a minimal ruff table (no rule selection) and no type checker configuration. A CI script runs 'ruff check . || true'.",
+      "expected_output": "Detects the Python stack and reads the existing configuration before changing it. Finds the '|| true' bypass in the CI script and reports it as the reason the lint check never fails. Proposes adding the security and bug-finding rule families to the existing configuration without replacing it, and a strict type check, merged into pyproject.toml. Asks before adding any dependency or running anything that needs network access (dependency audit). Does not run autofix."
+    },
+    {
+      "id": 4,
+      "name": "python-legacy-type-errors",
+      "prompt": "Turn on strict type checking for this Python project. There are probably a lot of existing errors.",
+      "setup": "Fictional repository 'acme-reports' using mypy with no strict setting. Running mypy reports several hundred errors concentrated in two legacy packages.",
+      "expected_output": "Runs the type check to record the baseline by error code. Proposes gradual mode: strict globally with per-module overrides for the two legacy packages, or strictness for the already-clean modules first. States that the exempt list is debt. Asks before adding markers to source files. Does not add type: ignore comments on its own."
+    },
+    {
+      "id": 5,
+      "name": "already-strict-no-change",
+      "prompt": "Check whether my .NET project's build is strict enough for coding agents and fix it if not.",
+      "setup": "Fictional solution 'Acme.Payments' whose Directory.Build.props already enables security analysis rules, failure-on-warning, and a pinned analysis level. The build passes with zero warnings.",
+      "expected_output": "Reads the effective state, finds every control enforced, and reports that nothing needs to change. Does not rewrite or reorder the existing file. Mentions the known limits (suppressions can still bypass the checks) and may suggest the related skills for hooks and architecture rules, without applying them."
+    },
+    {
+      "id": 6,
+      "name": "unsupported-stack",
+      "prompt": "Configure strict checks so my coding agent gets blocked on bad code. The project is written in Go.",
+      "setup": "Fictional repository 'acme-gateway' with go.mod and Go source files.",
+      "expected_output": "Finds no matching stack reference. Explains in concept what this skill would do, says Go is not supported yet, and changes no file. Does not improvise Go-specific configuration from memory."
+    }
+  ]
+}

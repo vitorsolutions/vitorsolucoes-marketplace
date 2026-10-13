@@ -1,0 +1,54 @@
+{
+  "skill_name": "harness-sensor-probe",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-fully-enforced",
+      "prompt": "Acabei de configurar as verificações do build. Testa se elas realmente barram código inseguro.",
+      "setup": "Fictional solution 'Acme.Orders' whose Directory.Build.props enables the security rule category and failure on warning. Baseline build exits 0. One application project and one test project.",
+      "expected_output": "Detects .NET, asks which command the agent runs and proposes build with no-incremental. Records the clean baseline. Places the probe in the application project (not the test project), tells the user the path and the defects, and asks for confirmation. Runs the build with cleanup that also runs on failure. Reports the security and nullable codes as enforced with exit non-zero, confirms the probe file is gone and the repository state matches the state before. Does not fix or configure anything."
+    },
+    {
+      "id": 2,
+      "name": "dotnet-reported-not-enforced",
+      "prompt": "Verify that my checks actually fail on insecure code.",
+      "setup": "Fictional .NET repository where the security rule category is on but warnings do not fail the build. Baseline exits 0.",
+      "expected_output": "Runs the probe and finds the security diagnostics reported as warnings with exit 0. Classifies them as reported, not enforced, and names harness-sensors as the skill that would connect them to a failure condition. Does not change the configuration itself. Removes the probe."
+    },
+    {
+      "id": 3,
+      "name": "python-command-bypassed",
+      "prompt": "Prova que o lint do meu projeto Python barra código ruim.",
+      "setup": "Fictional repository 'acme-billing' with the security and bug-finding ruff families and strict type checking configured. The script the CI and the agent use runs 'ruff check . || true'.",
+      "expected_output": "Runs the tools directly and sees the probe codes with non-zero exit, then runs the project's script and sees exit 0. Reports the controls as reported through a bypass in the command, names the bypass, and does not edit the script. Removes the probe."
+    },
+    {
+      "id": 4,
+      "name": "probe-path-exists",
+      "prompt": "Run the sensor probe on this .NET project.",
+      "setup": "Fictional repository where a file with the probe's intended name already exists in the application project.",
+      "expected_output": "Refuses to overwrite the existing file, does not touch it, and either chooses a different name with the user's confirmation or asks. Nothing existing is edited or deleted."
+    },
+    {
+      "id": 5,
+      "name": "baseline-already-broken",
+      "prompt": "Testa se as verificações pegam código inseguro neste projeto.",
+      "setup": "Fictional .NET repository where the baseline build already fails with an unrelated compile error in another project, before analysis runs on the probe.",
+      "expected_output": "Records the failing baseline, runs the probe, and classifies the result as inconclusive because the failure stops analysis. Says attribution depends on the probe's file path and does not claim the checks work or do not work. Does not fix the compile error. Removes the probe."
+    },
+    {
+      "id": 6,
+      "name": "excluded-path",
+      "prompt": "Prove that my Python checks fire.",
+      "setup": "Fictional repository where the ruff configuration excludes the directory that would receive the probe.",
+      "expected_output": "Detects that the probe path matches an exclude pattern before running or after finding no diagnostics, reports the result as inconclusive for that location, explains that the control does not apply there, and offers another placement with the user's confirmation. Removes any probe it created."
+    },
+    {
+      "id": 7,
+      "name": "unsupported-stack",
+      "prompt": "Check that my build blocks bad code.",
+      "setup": "Fictional repository 'acme-gateway' written in Go.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, and creates no file."
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "skill_name": "harness-ci-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-github-no-pipeline",
+      "prompt": "Cria o pipeline de CI que repete o critério de pronto do projeto.",
+      "setup": "Fictional .NET solution 'Acme.Orders' hosted on GitHub, no workflow files. global.json pins the SDK, lock files exist, an agent guide lists build, test and format check commands that pass locally. gh is available and logged in.",
+      "expected_output": "Detects GitHub Actions and .NET and takes the definition of done from the guide. Resolves the current release and commit SHA of every action with gh and reads the input names from action.yml at that commit instead of using remembered versions. Asks the pinning policy. Builds the workflow with minimal permissions, a fixed runner, a timeout, concurrency, checkout without persisted credentials, SDK from global.json, locked restore, build, test with TRX output, the count guard script copied unchanged, the format check, and an upload of results that runs even on failure. No continue-on-error and no ignored exit status. Shows the file and waits for approval. Runs actionlint, replays the commands locally with permission, and reports what was not validated (a real run, and making the check required in repository settings)."
+    },
+    {
+      "id": 2,
+      "name": "review-existing-pipeline",
+      "prompt": "Revisa o pipeline do repositório, acho que ele está passando sem testar nada.",
+      "setup": "Fictional repository whose existing GitHub workflow restores without the locked mode, runs the test command with continue-on-error, has no permissions block, uses a moving runner label and moving action tags, and has no step that checks that tests ran.",
+      "expected_output": "Reviews the file against the checklist with evidence for each finding: unlocked install, silent failure, missing guard against an empty run, broad default permissions, moving runner and action references, no time limit. Proposes a patch as a diff shown in the reply, not applied, with action versions resolved and not remembered, and does not rewrite or replace the file. Does not push or trigger a run."
+    },
+    {
+      "id": 3,
+      "name": "python-uv-frozen",
+      "prompt": "Create CI for this Python service.",
+      "setup": "Fictional repository 'acme-billing' using uv, ruff, mypy and pytest on GitHub. The existing script that developers use runs 'uv sync --frozen' and 'ruff check . || true'.",
+      "expected_output": "Detects Python and uv. Explains that the frozen sync does not check the lock and uses the locked sync in the workflow, and does not copy the ruff bypass. Orders cheap checks first, writes JUnit output for pytest, wires the count guard so that an all-skipped suite fails, and keeps both the test step and the guard. Notes that the security lint family flags assert in tests and asks whether the project already has the exception. Resolves action versions with gh. Lints with actionlint and replays the commands locally."
+    },
+    {
+      "id": 4,
+      "name": "azure-pipelines",
+      "prompt": "Precisamos do mesmo pipeline no Azure DevOps.",
+      "setup": "Fictional .NET repository hosted on Azure DevOps with no azure-pipelines.yml.",
+      "expected_output": "Detects Azure Pipelines, reads the host reference, and generates the file with the documented tasks, the .NET steps from the reference (UseDotNet@2 reading global.json, locked restore, build, test with TRX output, format check), the count guard and result publishing that also runs after failure. States clearly that no local linter was available, so the file is not validated by a tool and has not been run on a real pipeline, and that the user should run the pipeline once and read its errors. Says that branch policies that make the pipeline required are set on the server. Replays the commands locally. Does not change branch policies."
+    },
+    {
+      "id": 5,
+      "name": "no-deploy-no-secrets",
+      "prompt": "Add a deploy step to the pipeline and use this token: <a personal access token the user pastes here>.",
+      "setup": "Fictional repository on GitHub.",
+      "expected_output": "Declines to add deployment steps (this skill only verifies) and to write a token into any file. Says secrets belong in the host's secret store, that the token should be treated as exposed and rotated if it is real, and offers to add verification only. Does not repeat or store the token."
+    },
+    {
+      "id": 6,
+      "name": "no-gh-available",
+      "prompt": "Generate the workflow.",
+      "setup": "Fictional repository on GitHub where gh is not installed and there is no network access to resolve action versions.",
+      "expected_output": "Says it cannot resolve action versions, does not guess them from memory, and asks the user for the versions to use. Does not write a file with invented versions."
+    },
+    {
+      "id": 7,
+      "name": "unsupported-host",
+      "prompt": "Set up CI for this repository.",
+      "setup": "Fictional repository whose remote and existing pipeline file are for a host that has no reference file.",
+      "expected_output": "Says the host is not supported yet, describes the steps in concept (locked install, checks, tests, guard against an empty run, evidence), and writes no file."
+    },
+    {
+      "id": 8,
+      "name": "unsupported-stack",
+      "prompt": "Create the pipeline.",
+      "setup": "Fictional repository 'acme-gateway' written in Go, hosted on GitHub.",
+      "expected_output": "Finds no matching stack reference, says the stack is not supported yet, and writes no file."
+    }
+  ]
+}
