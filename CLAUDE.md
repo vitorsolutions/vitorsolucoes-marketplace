@@ -145,7 +145,6 @@ Any new .NET-focused skill belongs to this plugin instead of a new domain.
 Any new AI-tooling/meta skill (agent engineering, and similar meta-concerns as they arise)
 belongs to this plugin instead of a new domain.
 
-
 - **security** — security investigation and protective guidance. See `plugins/security/`. Skills:
   - `job-scam-investigator` — evidence-led assessment of job advertisements, recruiter messages,
     and hiring processes. Uses passive independent verification, separate risk/confidence labels,
@@ -154,3 +153,27 @@ belongs to this plugin instead of a new domain.
 
 New security investigation skills belong to this domain. Run the helper tests from
 `plugins/security/skills/job-scam-investigator` with `python -m unittest discover -s tests -v`.
+
+- **ticket-engineering** — the support-ticket domain: skills a developer runs from inside a
+  codebase when picking up a ticket. Agnostic to the ticket system (no vendor or tool name is
+  assumed — the ticket is read through whatever ticket tool the session exposes, or from pasted
+  text) and to the stack. Every skill is read-only and stateless: no files written, nothing saved
+  to memory; each one ends with a fixed-format block in the conversation that the next one picks
+  up. See `plugins/ticket-engineering/`. Skills:
+  - `ticket-triage` — router: classifies the ticket by content (incident, question, improvement,
+    request), judges completeness, points to the likely area of the code, and names the next step.
+  - `ticket-investigation` — facts only, each with a file:line reference; lists what is not
+    verifiable from the repository; never concludes a cause.
+  - `ticket-diagnosis` — type-aware conclusion graded Observed/Hypothesis/Risk/Recommendation,
+    with confidence stated as confirmed, probable, or inconclusive; never applies a fix.
+  - `ticket-response` — requester-facing draft (clarification request, answer, status update,
+    resolution) free of internal detail; posts through a ticket tool only when the developer asks
+    and after explicit confirmation of text, destination, and visibility.
+
+  Eval fixtures shared by the four skills live in `plugins/ticket-engineering/fixtures/` (the same
+  invented domain in two stacks) and are referenced from each `evals.json` via `files`. They
+  contain intentional, unmarked mismatches between documented and implemented behavior — do not
+  fix them. Eval prompts use ticket ids in the `DEMO-<n>` form so a run can never match a real
+  ticket.
+
+Any new ticket-handling skill belongs to this plugin instead of a new domain.

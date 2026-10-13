@@ -1,0 +1,6 @@
+[project]
+name = "acme-billing"
+version = "0.1.0"
+description = "Subscription billing service for the Acme storefront"
+requires-python = ">=3.11"
+dependencies = []

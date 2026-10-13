@@ -30,3 +30,6 @@ catalog/dist/
 catalog/.astro/
 catalog/public/pagefind/
 /.playwright-mcp
+
+# skill-creator eval run workspaces (sibling to the skill directory)
+*-workspace/

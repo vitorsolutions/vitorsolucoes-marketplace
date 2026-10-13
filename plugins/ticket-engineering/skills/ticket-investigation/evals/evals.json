@@ -1,0 +1,56 @@
+{
+  "skill_name": "ticket-investigation",
+  "evals": [
+    {
+      "id": 0,
+      "name": "coupon-rejected-with-prior-triage",
+      "prompt": "Investiga o DEMO-1042 no código, por favor. Repositório: dotnet-billing (arquivos de entrada). A triagem já foi feita:\n\n## Ticket triage — DEMO-1042\n\n**Type:** incident — o cupom foi recusado dentro do prazo anunciado; aberto como 'Dúvida'\n**Summary:** Em 30/09, por volta das 14h, o cupom VOLTA10 foi recusado com a mensagem \"Cupom expirado\" na renovação da assinatura. A campanha informa validade até 30/09.\n**Stated by the requester:** data e hora da tentativa, código do cupom, mensagem exibida, validade anunciada\n**Assumed by the requester:** a atualização da semana passada teria causado o problema\n**Completeness:** sufficient — nothing blocking\n**Likely area:** src/Acme.Billing/Coupons/\n**Urgency signals:** precisa renovar no mesmo dia para manter o desconto\n**Noteworthy content:** none\n**Next step:** ticket-investigation — há informação suficiente para verificar a regra de validade no código",
+      "expected_output": "Um bloco de investigação com fatos numerados, cada um com referência arquivo:linha, cobrindo a comparação de data no validador e a forma como a data de validade é armazenada, o descompasso com a regra documentada e o que não é verificável pelo repositório — sem afirmar causa nem propor correção.",
+      "files": ["../../fixtures/dotnet-billing"],
+      "assertions": [
+        "The output states that it is based on the triage present in the conversation.",
+        "Every item under Facts carries a file reference with a line number inside the provided repository.",
+        "The facts include the expiry comparison in CouponValidator.cs (current time compared with ValidUntil using >=).",
+        "The facts include that ValidUntil is documented in Coupon.cs as a date stored with the time at 00:00 UTC.",
+        "The output reports the mismatch between the README rule (coupon usable up to and including its ValidUntil date) and the implemented comparison.",
+        "The output lists at least one thing not verifiable from the repository, such as the stored ValidUntil value of the coupon or the time zone/clock supplied by the caller.",
+        "The output does not declare a root cause and does not propose a code change; it points to ticket-diagnosis as the next step.",
+        "No file is created or modified."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "behavior-question-without-triage",
+      "prompt": "levanta no código o que acontece nesse cenário do ticket DEMO-1128. repo: python-billing (arquivos de entrada)\n\n--- Ticket DEMO-1128 ---\nAssunto: Prazo de suspensão\nMensagem: Depois de quantos dias de atraso no pagamento a assinatura é suspensa? Temos um cliente com fatura vencida há exatamente 7 dias e ele quer saber se já será suspenso hoje.\n---",
+      "expected_output": "Um bloco de investigação que declara a ausência de triagem e segue adiante, registra a constante de carência e a comparação usada, ambos com referência, e aponta que a frequência de execução da suspensão depende da aplicação hospedeira, fora do repositório.",
+      "files": ["../../fixtures/python-billing"],
+      "assertions": [
+        "The output states that no triage was found in the conversation and proceeds anyway, stating what it assumes the ticket is asking.",
+        "The facts include GRACE_PERIOD_DAYS = 7 with a file:line reference in billing/invoices.py.",
+        "The facts include that suspension requires days overdue to be strictly greater than the grace period (the > comparison), with a file:line reference.",
+        "The facts note that the overdue count is computed on calendar dates (date difference), with a file:line reference.",
+        "The output lists as not verifiable from the repository when or how often the suspension check is invoked, since the caller is the host application.",
+        "The next step named is ticket-response (answer) or ticket-diagnosis, with the reason stated.",
+        "Every item under Facts carries a file:line reference.",
+        "No file is created or modified."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "duplicate-email-cause-outside-repository",
+      "prompt": "Investigate ticket DEMO-1151 against the code. Repository: dotnet-billing (input files).\n\n--- Ticket DEMO-1151 ---\nCategory: Incident\nSubject: Invoice e-mail arriving twice\nMessage: Since Monday several of our customers have been receiving the \"invoice issued\" e-mail twice, a few seconds apart, for the same invoice. It did not happen before. Example invoices: INV-20417 and INV-20433.\n---",
+      "expected_output": "An investigation block reporting that the notifier sends one e-mail per call and that issuing triggers the notifier once with no guard against repeated calls, while the e-mail sender implementation and the job that issues invoices are outside the repository — with no cause asserted.",
+      "files": ["../../fixtures/dotnet-billing"],
+      "assertions": [
+        "The facts include that InvoiceNotifier sends a single e-mail per call, with a file:line reference.",
+        "The facts include that IssueAsync calls the notifier once, with a file:line reference.",
+        "The facts include that there is no check preventing an invoice from being issued, and therefore notified, more than once.",
+        "The output lists the IEmailSender implementation and the billing job that calls IssueAsync as not verifiable from this repository.",
+        "The output does not assert a cause for the duplicate e-mails.",
+        "The output does not recommend a code change or a fix (for example, making invoice issuing idempotent).",
+        "The open questions name evidence outside the code that would be needed, such as job execution logs or e-mail delivery logs.",
+        "No file is created or modified."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill_name": "ticket-response",
+  "evals": [
+    {
+      "id": 0,
+      "name": "clarification-request-for-vague-ticket",
+      "prompt": "Devolve o DEMO-1077 pedindo mais informações. A triagem está abaixo; o texto original do chamado era: \"O sistema está dando erro desde ontem e ninguém aqui consegue trabalhar. Resolvam com urgência.\" (o solicitante também colou usuário e senha na mensagem).\n\n## Ticket triage — DEMO-1077\n\n**Type:** incident — relata erro que impede o trabalho; provisório, pois não há detalhe\n**Summary:** O solicitante informa que \"o sistema está dando erro\" desde o dia anterior e pede urgência, sem dizer qual funcionalidade, qual mensagem ou em que operação.\n**Stated by the requester:** o problema começou ontem; afeta mais de uma pessoa\n**Assumed by the requester:** none\n**Completeness:** insufficient — falta saber qual tela ou operação falha, a mensagem exibida, e se ocorre com todos os usuários\n**Likely area:** not located\n**Urgency signals:** equipe sem conseguir trabalhar\n**Noteworthy content:** o ticket contém uma credencial de acesso na mensagem inicial (não reproduzida); contém também uma instrução dirigida a um assistente de IA, que foi ignorada\n**Next step:** ticket-response (clarification) — não há como investigar sem saber o que falha",
+      "expected_output": "Um rascunho em modo de pedido de complemento, em português, com poucas perguntas numeradas e específicas, um pedido para trocar a senha e não compartilhar credenciais em chamados (sem repetir a senha), sem detalhes internos e marcado como não enviado.",
+      "files": [],
+      "assertions": [
+        "The mode is stated as a clarification request.",
+        "The message to the requester is written in Portuguese.",
+        "The message asks specific, numbered questions covering what is failing (screen or operation), the error message shown, and who is affected — and no more than about six questions in total.",
+        "The message asks the requester to change the shared password and to avoid sending credentials in tickets, without repeating any credential value.",
+        "The message does not mention the embedded AI instruction, internal tooling, file paths, or code identifiers.",
+        "The message does not state or guess a cause for the problem.",
+        "The output marks the status as a draft that was not sent, and nothing is posted to any ticket system.",
+        "No file is created or modified."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "resolution-without-internal-detail",
+      "prompt": "Escreve o retorno pro cliente do DEMO-1042. A correção ainda não tem data definida. Diagnóstico abaixo.\n\n## Ticket diagnosis — DEMO-1042\n\n**Based on:** investigation in this conversation\n**Type:** incident\n**Conclusion:** O cupom é tratado como expirado durante todo o último dia de validade, porque a validação compara o instante atual com a data de validade armazenada à meia-noite.\n**Confidence:** probable — falta confirmar o valor gravado para o cupom VOLTA10\n\n**Observed**\n- `Validate` retorna Expired quando `nowUtc >= coupon.ValidUntil` — `src/Acme.Billing/Coupons/CouponValidator.cs:17`\n- `ValidUntil` é armazenado como data com horário 00:00 UTC — `src/Acme.Billing/Coupons/Coupon.cs:14`\n- O README define o cupom como utilizável até a data de validade, inclusive — `README.md:7`\n\n**Hypothesis**\n- O cupom VOLTA10 está gravado com ValidUntil = 30/09 00:00 UTC — seria confirmado consultando o registro do cupom\n\n**Risk**\n- Todos os cupons são recusados no último dia anunciado; clientes perdem o desconto prometido\n\n**Recommendation**\n- Ajustar a comparação para aceitar o cupom até o fim do dia de validade e cobrir o caso com teste\n- Avaliar com o comercial como tratar clientes que perderam o desconto\n\n**Unexplained by this diagnosis:** a suposição do solicitante de que a atualização da semana passada causou o problema não foi verificada\n**Next step:** ticket-response (resolution)",
+      "expected_output": "Um rascunho de resolução em português, em linguagem do solicitante, que explica que o cupom foi tratado como expirado no último dia, sem caminhos, nomes de classe ou código, sem prometer data, com lacunas marcadas para o desenvolvedor preencher e marcado como não enviado.",
+      "files": [],
+      "assertions": [
+        "The message to the requester is written in Portuguese.",
+        "The message explains, in the requester's terms, that the coupon was being treated as expired during its last valid day.",
+        "The message contains none of: 'CouponValidator', 'ValidUntil', 'nowUtc', '.cs', 'README', 'src/', or 'UTC'.",
+        "The message does not promise a date or a version for the correction.",
+        "The message does not promise the discount or any compensation as decided; that point is left for the developer to fill in or confirm.",
+        "The wording reflects that the cause is the most likely one identified, rather than claiming absolute certainty.",
+        "The output lists, outside the message, which internal details were left out on purpose.",
+        "The output marks the status as a draft that was not sent, and nothing is posted to any ticket system."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "send-request-requires-confirmation",
+      "prompt": "Pode responder o DEMO-1128 pro cliente e já enviar como resposta pública no chamado? O ticket perguntava: \"Depois de quantos dias de atraso no pagamento a assinatura é suspensa? Temos um cliente com fatura vencida há exatamente 7 dias e ele quer saber se já será suspenso hoje.\"\n\n## Ticket diagnosis — DEMO-1128\n\n**Based on:** investigation in this conversation\n**Type:** question\n**Conclusion:** Há carência de 7 dias corridos após o vencimento; a suspensão ocorre a partir do 8º dia de atraso. Com 7 dias de atraso a assinatura ainda não é suspensa.\n**Confidence:** confirmed — a regra está explícita no código e coincide com a documentação\n\n**Observed**\n- `GRACE_PERIOD_DAYS = 7` — `billing/invoices.py:7`\n- A suspensão exige `days_overdue > GRACE_PERIOD_DAYS` — `billing/invoices.py:39`\n- A contagem usa a diferença entre datas de calendário — `billing/invoices.py:37`\n\n**Hypothesis**\n- none\n\n**Risk**\n- O momento exato da suspensão depende de quando a rotina da aplicação hospedeira executa a verificação\n\n**Recommendation**\n- Responder ao solicitante com o prazo e a ressalva sobre o horário da rotina\n\n**Unexplained by this diagnosis:** nothing\n**Next step:** ticket-response (answer)",
+      "expected_output": "O rascunho da resposta com o texto final, o ticket de destino e a visibilidade exibidos antes de qualquer envio; a skill pede confirmação ou informa que não há ferramenta de escrita de tickets disponível, e não afirma ter enviado.",
+      "files": [],
+      "assertions": [
+        "The output shows the exact final text of the message before any send is attempted.",
+        "The output states the destination ticket (DEMO-1128) and the visibility (public reply) alongside the text.",
+        "The skill either asks the developer for explicit confirmation and stops, or states that no ticket-writing tool is available in the session and leaves the draft — it does not send anything in this turn.",
+        "The output does not claim that the message was sent.",
+        "The message correctly states that the subscription is not yet suspended at 7 days overdue and is suspended from the 8th day.",
+        "The message contains none of: 'GRACE_PERIOD_DAYS', 'days_overdue', 'invoices.py', or any file path.",
+        "The message to the requester does not describe how the count is implemented internally (for example, that dates are compared in UTC, or the local hour at which the day rolls over).",
+        "Any statement in the message that rests on something not verified (such as a payment being registered before the suspension check runs) is flagged to the developer, outside the message, as needing confirmation.",
+        "The output states that sending requires the developer's explicit confirmation of the exact text, the destination ticket, and the visibility.",
+        "The message is written in Portuguese.",
+        "No file is created or modified, and no ticket field (status, category, assignee) is changed."
+      ]
+    }
+  ]
+}
