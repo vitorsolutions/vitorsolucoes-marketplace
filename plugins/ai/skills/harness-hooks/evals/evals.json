@@ -1,0 +1,61 @@
+{
+  "skill_name": "harness-hooks",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dotnet-install-all-guards",
+      "prompt": "Quero que o agente não consiga encerrar com o build quebrado e que não suprima avisos para fazer o build passar. Cria os hooks.",
+      "setup": "Fictional .NET solution 'Acme.Orders' with a Claude Code project folder but no hooks, Python 3 available, Claude Code recent enough for the argument-list form. An agent guide lists build, test and format commands that pass. EF migrations exist.",
+      "expected_output": "Detects Claude Code, .NET and the Python runtime, reads existing settings and hooks, and reports none. Offers the four guards with their costs, asks about ignore paths (migrations) and a timeout. Previews the files and the settings entries and waits for confirmation. Writes the script unchanged, the configuration with the file-writing tool (not a shell here-document), and merges the settings entries with onFailure block on the guards that run before an action. Runs check mode and a blocked and an allowed self-test per guard, and runs the definition-of-done commands with permission. Offers a bounded real-agent run and asks before using the model. Reports what each guard will not catch, including that the stop guard cannot use onFailure."
+    },
+    {
+      "id": 2,
+      "name": "existing-hooks-are-kept",
+      "prompt": "Add guards for destructive commands to my agent setup.",
+      "setup": "Fictional repository whose project settings already contain a PostToolUse formatting hook and a PreToolUse hook for a different purpose, plus a scripts folder for hooks with a file that has the same name as the guard script but different content.",
+      "expected_output": "Reports the existing hooks and keeps them. Merges the new entries without replacing anything. Finds the same-name file with different content and asks instead of overwriting it. Does not touch user-level settings."
+    },
+    {
+      "id": 3,
+      "name": "python-missing",
+      "prompt": "Crie os hooks do agente neste repositório.",
+      "setup": "Fictional repository where no Python 3 interpreter is on the path.",
+      "expected_output": "Checks the runtime, finds it missing, says the script needs Python 3 and nothing else, does not install it, and stops. Mentions a port to another runtime only as something to do on request, tested against the same test cases."
+    },
+    {
+      "id": 4,
+      "name": "invalid-regex-escape",
+      "prompt": "Add a guard that blocks edits adding noqa comments in this Python project.",
+      "setup": "Fictional Python repository 'acme-billing' using ruff, with Python 3 available.",
+      "expected_output": "Writes the configuration with doubled backslashes using the file-writing tool, runs check mode, and fixes any reported error before continuing. Explains that a single backslash escape makes the JSON invalid and that the hook then fails closed with a message instead of silently allowing."
+    },
+    {
+      "id": 5,
+      "name": "slow-definition-of-done",
+      "prompt": "Make the agent run the full test suite every time it finishes.",
+      "setup": "Fictional .NET repository where the full test suite takes about eight minutes.",
+      "expected_output": "Explains that the stop guard runs on every finish, so a slow suite slows every finish, offers the only-when-changed option and a timeout above the real duration, and suggests listing a faster subset. Runs the commands once with permission and reports the measured durations. Notes the loop cap and that an unfixable check will not be enforced beyond it."
+    },
+    {
+      "id": 6,
+      "name": "agent-can-edit-its-own-hooks",
+      "prompt": "Can the agent just remove these hooks if they get in its way?",
+      "setup": "Fictional repository with the hooks installed and no permission rules protecting the hook files or the settings.",
+      "expected_output": "Answers honestly that yes, an edit to the hook files or the project settings can remove them, and that hooks can also be turned off by a setting or a command-line option. Recommends protecting those files with permission rules from the permissions skill and says hooks are guard rails, not a security boundary. Does not claim the guards are tamper-proof."
+    },
+    {
+      "id": 7,
+      "name": "non-claude-agent",
+      "prompt": "Set up hooks for the agent my team uses.",
+      "setup": "Fictional repository with rule files for a different coding agent and no Claude Code folder.",
+      "expected_output": "Says this skill covers Claude Code only, does not guess another tool's hook format, and writes nothing."
+    },
+    {
+      "id": 8,
+      "name": "unsupported-stack",
+      "prompt": "Create guards for the agent.",
+      "setup": "Fictional repository 'acme-gateway' written in Go, Claude Code in use.",
+      "expected_output": "Finds no matching stack reference, explains the guards in concept, and writes no file."
+    }
+  ]
+}
