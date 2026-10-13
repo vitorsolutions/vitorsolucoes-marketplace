@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin%20Marketplace-5A67D8?style=flat-square)](https://github.com/vitorsolutions/vitorsolucoes-marketplace)
-[![Plugins](https://img.shields.io/badge/plugins-5-2563eb?style=flat-square)](./plugins)
-[![Skills](https://img.shields.io/badge/skills-15-2563eb?style=flat-square)](./plugins)
+[![Plugins](https://img.shields.io/badge/plugins-6-2563eb?style=flat-square)](./plugins)
+[![Skills](https://img.shields.io/badge/skills-31-2563eb?style=flat-square)](./plugins)
 
 A [Claude Code](https://claude.com/claude-code) plugin marketplace maintained by **Vitor
 Soluções**, following the official plugin marketplace format. Each domain is an independent
