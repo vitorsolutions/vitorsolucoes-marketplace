@@ -1,0 +1,6 @@
+{
+  "name": "ticket-engineering",
+  "version": "1.0.0",
+  "description": "Ticket engineering plugin — skills a developer runs from inside a codebase when picking up a support ticket: triage, evidence gathering against the code, type-aware diagnosis, and a requester-facing reply draft. Agnostic to the ticket system and to the stack; read-only, with state kept in the conversation.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}

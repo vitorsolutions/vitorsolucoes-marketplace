@@ -1,0 +1,55 @@
+{
+  "skill_name": "ticket-diagnosis",
+  "evals": [
+    {
+      "id": 0,
+      "name": "coupon-incident-with-investigation",
+      "prompt": "Qual o diagnóstico do DEMO-1042? Repositório: python-billing (arquivos de entrada). A investigação está abaixo.\n\n## Ticket investigation — DEMO-1042\n\n**Based on:** triage in this conversation\n**Question investigated:** O que o código faz quando um cupom é aplicado no último dia de validade (ticket: cupom VOLTA10 recusado em 30/09 às 14h com \"Cupom expirado\", campanha válida até 30/09)?\n**Scope examined:** billing/coupons.py, README.md; branch main\n**Facts:**\n1. A validação retorna EXPIRED quando `now_utc >= coupon.valid_until` — `billing/coupons.py:29`\n2. `valid_until` é documentado como a última data de uso, armazenada com horário 00:00 UTC — `billing/coupons.py:18`\n3. Cupons inativos retornam INACTIVE antes da checagem de data — `billing/coupons.py:26`\n**Documented vs. implemented:** o README afirma que o cupom pode ser usado até a data `valid_until`, inclusive — `README.md:7`\n**Not verifiable from this repository:** o valor de `valid_until` gravado para o cupom VOLTA10; o fuso horário do relógio usado por quem chama a validação\n**Open questions:** nenhuma para o solicitante\n**Next step:** ticket-diagnosis",
+      "expected_output": "Um bloco de diagnóstico concluindo que o cupom é tratado como expirado durante todo o último dia de validade, com confiança confirmada ou provável (nomeando o que não foi verificado), afirmações separadas em Observed, Hypothesis, Risk e Recommendation, e encaminhamento para ticket-response.",
+      "files": ["../../fixtures/python-billing"],
+      "assertions": [
+        "The conclusion states that a coupon is rejected as expired during its final valid day because the current time is compared against a date stored at midnight.",
+        "Confidence is stated as confirmed or probable; if probable, the unverified element (the stored valid_until value or the caller's clock) is named.",
+        "Every code observation under Observed carries a file:line reference, and any other entry there (something stated in the ticket, or the absence of something in the repository) names its source.",
+        "The stored value for the VOLTA10 coupon is treated as a Hypothesis or as unverified, not as Observed.",
+        "The output contains separate Observed, Hypothesis, Risk, and Recommendation sections.",
+        "The skill does not edit any file or apply a fix; the correction appears only as a recommendation.",
+        "The next step named is ticket-response."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "duplicate-email-inconclusive",
+      "prompt": "Diagnose ticket DEMO-1151 from this investigation. Repository: dotnet-billing (input files).\n\n## Ticket investigation — DEMO-1151\n\n**Based on:** ticket only — no triage found\n**Question investigated:** What does the code do when an invoice is issued, and can it produce two \"invoice issued\" e-mails for the same invoice (reported since Monday, a few seconds apart)?\n**Scope examined:** src/Acme.Billing/Invoices/InvoiceService.cs, src/Acme.Billing/Notifications/InvoiceNotifier.cs; branch main\n**Facts:**\n1. `IssueAsync` sets `IssuedOn` and calls the notifier once — `src/Acme.Billing/Invoices/InvoiceService.cs:24`\n2. `SendInvoiceIssuedAsync` makes a single call to `IEmailSender.SendAsync` — `src/Acme.Billing/Notifications/InvoiceNotifier.cs:24`\n3. `IssueAsync` does not check whether the invoice was already issued before notifying — `src/Acme.Billing/Invoices/InvoiceService.cs:20`\n4. `IEmailSender` is an interface with no implementation in this repository — `src/Acme.Billing/Notifications/InvoiceNotifier.cs:5`\n**Documented vs. implemented:** README states the customer receives one e-mail per issued invoice; the code sends one per call to `IssueAsync`\n**Not verifiable from this repository:** the e-mail sender implementation and any retry it performs; the billing job that calls `IssueAsync` and how often it runs\n**Open questions:** whether anything changed in the host application or its schedule on Monday\n**Next step:** ticket-diagnosis",
+      "expected_output": "A diagnosis block that declares the result inconclusive, presents the competing explanations as hypotheses, states what evidence would discriminate between them, and does not settle on a single cause.",
+      "files": ["../../fixtures/dotnet-billing"],
+      "assertions": [
+        "Confidence is stated as inconclusive.",
+        "At least two candidate explanations are listed (for example, the billing job issuing the same invoice twice, and the e-mail sender retrying or duplicating delivery).",
+        "The candidate explanations appear as Hypothesis, not as Observed.",
+        "The absence of a guard against issuing the same invoice twice is listed as Observed, with a file:line reference.",
+        "The output states what evidence would discriminate between the candidates (such as job execution logs or e-mail delivery logs).",
+        "The output does not present any single explanation as the definitive cause.",
+        "The output notes that the diagnosis does not explain why the behavior started on Monday.",
+        "The skill does not edit any file."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "improvement-impact-without-investigation",
+      "prompt": "O que seria necessário para atender esse ticket? Estou no dotnet-billing (arquivos de entrada). Ainda não rodei a investigação.\n\n--- Ticket DEMO-1103 ---\nCategoria: Incidente\nAssunto: Exportação de faturas sem CNPJ\nMensagem: A exportação de faturas em CSV não traz o CNPJ do cliente. O financeiro precisa dessa coluna para conciliar com o ERP todo fim de mês. Podem corrigir?\n---",
+      "expected_output": "Um bloco de diagnóstico que declara a ausência de investigação, faz a leitura mínima do código com referências, trata o ticket como melhoria e descreve o impacto: colunas fixas no exportador, ausência do dado no modelo de cliente, origem do dado fora do repositório e requisitos em aberto — sem estimativa em horas ou dias.",
+      "files": ["../../fixtures/dotnet-billing"],
+      "assertions": [
+        "The output states that no investigation was found in the conversation and that the diagnosis rests on its own minimal reading of the code.",
+        "The ticket is treated as an improvement (feasibility and impact), not as a defect with a root cause.",
+        "The output observes, with a file:line reference, that the exporter writes a fixed set of columns that does not include a tax identifier.",
+        "The output observes, with a file:line reference, that the Customer model has no tax identifier field.",
+        "Where the tax identifier would come from (persistence or the host application) is flagged as unknown or not verifiable from this repository.",
+        "The output lists at least one requirement the ticket leaves open (for example, column format, behavior for customers without the identifier, or impact on consumers of the current CSV layout).",
+        "The output does not give an effort estimate in hours or days.",
+        "The skill does not edit any file."
+      ]
+    }
+  ]
+}
