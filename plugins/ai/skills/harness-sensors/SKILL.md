@@ -84,6 +84,10 @@ For each approved control:
 
 Do not batch several controls into one step. The point is to show the user what each control costs.
 
+### Optional: structured results
+
+If the user wants the analyzer findings published by CI (for example as SARIF in a code-scanning view), ask once. This is not a sensor and changes no exit status. When it is wanted, add the wiring the stack reference describes, confirm that a build with it writes the files, and hand the publishing to `harness-ci-pipeline`. When the stack reference has no such section, say it is not supported for that stack.
+
 ### 6. Confirm the controls really fail
 
 A control that is configured but does not fail the command is not a sensor. After applying, confirm each one is **enforced** by one of these, in order of preference:

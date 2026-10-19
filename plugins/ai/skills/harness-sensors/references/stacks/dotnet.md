@@ -48,6 +48,34 @@ Setting `AnalysisModeSecurity` enables a whole category of rules without touchin
 
 `AnalysisLevel` set to `latest` gives the newest rules after every SDK upgrade, which can turn a passing build into a failing one with no code change. Pinning it to a version (for example `8.0`) avoids that. Ask which behavior the user wants and state the trade-off. Because the default already follows the newest rules, the pinning question applies to every project that has not set `AnalysisLevel`.
 
+### Structured results (SARIF)
+
+SARIF output is not a control: it does not change whether the verification command passes. It writes the compiler and analyzer diagnostics to a file in the SARIF format so that CI can publish them (see `harness-ci-pipeline`). Add it only when the user wants the findings published somewhere. Keep it off by default so local builds write nothing extra.
+
+The compiler option is the MSBuild property `ErrorLog`: a path, optionally followed by `,version=2.1`. Valid versions are `1`, `2` and `2.1`. The default is `1`, and `2` and `2.1` both mean SARIF 2.1.0, so always set the version.
+
+Wire it in `Directory.Build.targets`, switched on by a property that only CI sets:
+
+```xml
+<Project>
+  <PropertyGroup Condition="'$(SarifDir)' != ''">
+    <ErrorLog>$(SarifDir)/$(MSBuildProjectName)-$(TargetFramework).sarif,version=2.1</ErrorLog>
+  </PropertyGroup>
+</Project>
+```
+
+CI then builds with `-p:SarifDir=<absolute folder>`. A local build does not set it and writes nothing. If a `Directory.Build.targets` already exists, merge into it. Read the effective state afterwards with `dotnet msbuild <project> -getProperty:ErrorLog -p:SarifDir=<folder>`. Without `SarifDir` the value is empty.
+
+Why this shape (each point was observed in a sample, see section 7):
+
+- **`.targets`, not `.props`.** Properties in `Directory.Build.props` are evaluated before the project body, so `$(TargetFramework)` is still empty for a single-target project and the file is named `Name-.sarif`.
+- **Not `-p:ErrorLog=...` on the command line.** A global property is not expanded per project, so `$(MSBuildProjectName)` reaches the compiler as literal text. A fixed path would also be shared by every project and target framework.
+- **One file per project and target framework.** A solution with a single-target library and a library targeting two frameworks produced three files.
+- **The folder must exist before the build.** The compiler does not create it, and every project fails with `CS0016`.
+- **The files are written even when the build fails** (checked with `-warnaserror`, exit `1`), which is when they matter most.
+- **Paths inside the files are absolute `file:///` URIs** of the machine that built. Consumers that expect repository-relative paths need to resolve them (see the CI host reference).
+- Use it with `--no-incremental`, as for every diagnostic count: a compilation that is skipped does not run the analyzers.
+
 ## 4. Gradual adoption
 
 Use when the baseline already has warnings.
@@ -70,6 +98,8 @@ Record the baseline counts by code in the report so the user can track progress.
 - **Legacy non-SDK-style projects** do not understand `AnalysisLevel`. Report them as unsupported by this pack and suggest migrating them separately.
 - **Diagnostic text depends on the SDK language.** Always match by code (`CS8602`, `CA2100`, `NU1903`).
 - **`dotnet build` without `--no-incremental`** can report fewer warnings than a clean build.
+- **A SARIF folder that is not empty at the start of a run** can mix files from an earlier run with the current ones. Use a new or emptied folder, outside the source tree.
+- **Restore-time diagnostics (`NU1901` to `NU1904`)** come from NuGet, not from the compiler. This pass did not check whether they appear in the compiler's SARIF files. Do not tell the user that the SARIF covers dependency vulnerabilities (see `nuget-dependency-audit`).
 - **Each diagnostic appears twice in the build output** (once inline and once in the summary). Count distinct occurrences by file, line and code, and never by counting matching lines. For example (the compiler prefix `warning`/`error` stays in English, the message text does not): `grep -E ': (warning|error) [A-Z]+[0-9]+' out.txt | sed -E 's/^ +//; s/ \[[^]]*\]$//' | sort -u | grep -oE '(warning|error) [A-Z]+[0-9]+' | sort | uniq -c`.
 
 ## 6. Limits
@@ -86,4 +116,6 @@ Also run in a throwaway sample project with SDK 10.0.401: the multi-property `-g
 
 Verified later (Microsoft Learn, .NET SDK, MSBuild, and Visual Studio versioning): SDK 8.0.100 ships with Visual Studio and MSBuild 17.8, and `-getProperty` is documented as available in MSBuild 17.8 and later. The counting command above was run on sample text only.
 
-Not verified in this pass: behavior on SDKs older than 10, and which individual `CA` rules are in the security category for other SDK versions.
+2026-10-19, against Microsoft Learn (C# compiler options to report errors and warnings): the `ErrorLog` property, the `version` values `1`, `2` and `2.1`, and the default `1`. Run in a throwaway sample solution (SDK 10.0.402, `AnalysisModeSecurity` set to `All`) with one single-target library and one library targeting two frameworks: with `ErrorLog` set in `Directory.Build.props` the single-target file was named `Lib-.sarif`, and in `Directory.Build.targets` it was `Lib-net10.0.sarif`; a command-line `-p:ErrorLog=` with a `$(...)` value was written literally; a missing output folder failed every project with `CS0016`; the three files reported `"version": "2.1.0"` and the rules `CA1822`, `CA1850` and `CA5351`, with absolute `file:///` URIs; with `-warnaserror` the build exited `1` and the three files were still written; without `SarifDir` the build wrote nothing and `-getProperty:ErrorLog` was empty. Only the Git Bash shell on Windows was used.
+
+Not verified in this pass: whether restore diagnostics appear in the files, Visual Basic and F# projects, behavior on SDKs older than 10, and which individual `CA` rules are in the security category for other SDK versions.

@@ -1,6 +1,6 @@
 {
   "name": "ai",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AI plugin — meta-skills for engineering the AI tooling itself: creating Claude Code agents/subagents, and the harness skills that prepare a repository for AI coding agents (checks that fail, style, banned APIs, tests, architecture rules, agent guide, permissions, hooks, CI, and proof that the checks fire), with .NET and Python stack packs.",
   "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
 }

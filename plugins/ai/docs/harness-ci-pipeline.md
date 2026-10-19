@@ -14,6 +14,7 @@ Local checks depend on someone, a person or an agent, running them. CI makes the
 - Includes a tested script that fails the run when a test run executed no tests, including a suite where everything was skipped. It skips XML files that are not test results, such as a coverage report.
 - Checks that the lock files exist before using a locked install, because a locked restore can succeed when there is no lock file.
 - Validates the file with the host's linter where one exists, and replays the same commands locally.
+- Publishes static-analysis results (SARIF) when the project emits them, as an artifact or to the host's code-scanning view. The write permission that publishing needs is confined to a separate job that runs no project code, and the run fails when the build wrote no SARIF file.
 
 ## Supported hosts and stacks
 
@@ -36,4 +37,4 @@ When you want every change verified the same way as on your machine: "create the
 
 ## Limits
 
-A valid file is not a working pipeline: only a real run proves it. CI protects nothing until the check is required before merging, which is a setting on the host. Pinned versions age and need updating. The count guard shows that tests ran, not that they are good tests.
+A valid file is not a working pipeline: only a real run proves it. Publishing SARIF shows findings and does not fail the run. The SARIF publishing steps were written from documentation and were not run on a host. CI protects nothing until the check is required before merging, which is a setting on the host. Pinned versions age and need updating. The count guard shows that tests ran, not that they are good tests.

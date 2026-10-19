@@ -86,13 +86,74 @@ Copy `scripts/assert_tests_ran.py` to `.github/scripts/assert_tests_ran.py`, unc
 
 The hosted Ubuntu runners include Python 3. If the user chooses a runner without it, add a setup step.
 
-## 5. The linter
+## 5. SARIF publication (optional)
+
+Two destinations. Ask which one:
+
+- **Artifact only**: the `verify` job uploads the SARIF folder with `actions/upload-artifact` (same step as the test results, a second artifact). Needs no extra permission. Findings can be downloaded but are not shown in the repository.
+- **Code scanning**: a second job downloads that artifact and uploads it with `github/codeql-action/upload-sarif`. This needs `security-events: write`, so it lives in its own job and the `verify` job keeps `contents: read`. The build and the tests never run with the write token.
+
+```yaml
+jobs:
+  verify:
+    env:
+      SARIF_DIR: ${{ github.workspace }}/sarif
+    steps:
+      # ... checkout, setup, restore ...
+      - name: Create the SARIF folder
+        run: mkdir -p "$SARIF_DIR"
+      - name: Build
+        run: dotnet build "$SOLUTION" --no-restore --no-incremental -p:SarifDir="$SARIF_DIR"
+      # ... tests, count guard ...
+      - name: Upload SARIF
+        if: always()
+        uses: actions/upload-artifact@<sha> # <tag>
+        with:
+          name: sarif
+          path: ${{ env.SARIF_DIR }}
+          retention-days: 7
+          if-no-files-found: error
+
+  publish-sarif:
+    needs: verify
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@<sha> # <tag>
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@<sha> # <tag>
+        with:
+          name: sarif
+          path: sarif
+      - uses: github/codeql-action/upload-sarif@<sha> # <tag>
+        with:
+          sarif_file: sarif
+          category: dotnet-analyzers
+```
+
+Notes:
+
+- **`if-no-files-found: error`** makes the upload fail when the build wrote no SARIF, so a broken wiring does not stay green.
+- **A job-level `permissions` block replaces the workflow one**, so `contents: read` is repeated. Private repositories may also need `actions: read` for the upload action. Read its documentation and `action.yml` at the resolved commit, and add only what it says it needs.
+- **The checkout** is there so the upload action can see the source files the SARIF points to (for example to compute fingerprints for tracking alerts across runs). Confirm that requirement in the action's documentation when you resolve its version.
+- **The fork condition** skips the publishing job for pull requests from forks, whose token cannot write.
+- **`!cancelled()`** keeps the publishing job running when `verify` failed, which is when findings matter.
+- **`category`** separates this analysis from others on the same commit. Use a distinct value per analysis.
+- Resolve the three extra actions (`download-artifact`, `upload-sarif`, and `upload-artifact` for the second artifact) the same way as the others (section 2). `upload-sarif` lives in `github/codeql-action`, so its releases are the CodeQL action's releases.
+- **Code scanning availability** depends on the repository: public repositories, or private ones with the host's code security product enabled. When it is not available, the upload fails. Offer the artifact-only destination instead.
+
+## 6. The linter
 
 `actionlint`, run for example with `uv run --with actionlint-py actionlint .github/workflows/ci.yml`. It exits `0` on a clean file and non-zero with findings. In the samples, both templates passed with exit `0`, and a deliberately bad workflow was rejected for an untrusted expression inserted in a script and for an undefined variable. Fix every finding.
 
 Linting does not prove that the workflow runs. Only a real run does.
 
-## 6. Pitfalls and limits
+## 7. Pitfalls and limits
 
 - **A required status check** has to be configured in the repository settings before merging is blocked on it. This skill does not change settings. Say so.
 - **Workflows triggered by pull requests from forks** run with reduced permissions and no secrets. The skeleton needs none.
@@ -102,8 +163,10 @@ Linting does not prove that the workflow runs. Only a real run does.
 - **Windows and macOS runners** need different shells and path syntax. The skeleton assumes Linux.
 - **A step with `continue-on-error`, or a script that ignores an exit status, is a silent failure.** The default shell of a `run` step fails on the first failing command.
 
-## 7. Verified on
+## 8. Verified on
 
 2026-10-12. Releases and commit SHAs were resolved with `gh` for `actions/checkout`, `actions/setup-dotnet`, `actions/setup-python`, `astral-sh/setup-uv` and `actions/upload-artifact`, and the input names used (`global-json-file`, `persist-credentials`, `retention-days`, `if-no-files-found`, `python-version`, and others) were read from each `action.yml` at the pinned commit. Both workflow templates passed `actionlint` 1.7.12, and the commands of each template were run locally in the same order on sample projects, with the count guard reading their real result files.
+
+Section 5 (SARIF publication) was written on 2026-10-19 from the structure of the other jobs and from knowledge of the actions' inputs. `gh` was not logged in, so no version, commit or `action.yml` was resolved, and `actionlint` was not available, so the snippet was **not linted and not run**. The permission names, the `sarif_file` and `category` inputs, the checkout requirement and the private-repository permissions must be confirmed against the resolved action when the file is generated.
 
 Not verified in this pass: a real run on GitHub, annotated tags, reusable workflows, self-hosted runners, and other operating systems.

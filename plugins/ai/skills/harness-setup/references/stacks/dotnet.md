@@ -29,6 +29,7 @@ Running a build, restore, or test is not read-only: ask first.
 | Permissions | For Claude Code: a `permissions` entry in `.claude/settings.json` or `.claude/settings.local.json` | Only user-level settings exist, or rules are broad allow lists with no deny rules for secrets or remote data |
 | Hooks | For Claude Code: a `hooks` entry in `.claude/settings.json` or `.claude/settings.local.json` | Hooks exist but do not cover the definition of done or the protected files |
 | CI | A pipeline definition in the host's usual place (for example `.github/workflows`, `azure-pipelines.yml`, `.gitlab-ci.yml`) that runs the same build and test commands | The pipeline skips the checks, or marks them `continue-on-error` |
+| Static-analysis results (optional) | `SarifDir` or `ErrorLog` in `Directory.Build.targets`, and a pipeline step that publishes `*.sarif` files (an artifact or a code-scanning upload) | Analyzers run but the findings stay in the build log, or the project emits SARIF and CI does not publish it |
 | Proof | A recorded probe result (the user can point to one) | Probe run before the last tool upgrade or configuration change. Compare the recorded probe date with `git log -1 --format=%cs -- global.json Directory.Build.props Directory.Packages.props .editorconfig` |
 
 ## 4. Where to look for agent-specific files
@@ -40,6 +41,7 @@ For Claude Code: `.claude/settings.json` (shared with the team), `.claude/settin
 - A property set in a project file overrides `Directory.Build.props`. Read the effective state, not a single file.
 - Several nested `Directory.Build.props` files: the nearest wins unless it imports its parent.
 - Test projects have different settings legitimately. Do not mark a layer partial because a test project differs.
+- The static-analysis results layer is optional. Report its absence as an observation and ask whether the user wants findings published. Do not count it as a gap on its own, and do not infer a need from the presence of analyzers. The skills involved are `harness-sensors` (emit) and `harness-ci-pipeline` (publish).
 - Package names for architecture tests change over time. Treat the two names above as common examples, not a complete list.
 
 ## 6. Verified on

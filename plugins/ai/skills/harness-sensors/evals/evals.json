@@ -42,6 +42,13 @@
       "prompt": "Configure strict checks so my coding agent gets blocked on bad code. The project is written in Go.",
       "setup": "Fictional repository 'acme-gateway' with go.mod and Go source files.",
       "expected_output": "Finds no matching stack reference. Explains in concept what this skill would do, says Go is not supported yet, and changes no file. Does not improvise Go-specific configuration from memory."
+    },
+    {
+      "id": 7,
+      "name": "dotnet-sarif-wiring-optional",
+      "prompt": "Quero que o build gere SARIF dos analyzers para o CI publicar, sem mudar o que faz o build falhar.",
+      "setup": "Fictional .NET solution 'Acme.Orders' with one single-target library and one library targeting two frameworks, security analysis already enforced. No Directory.Build.targets.",
+      "expected_output": "Explains that SARIF is not a sensor and changes no exit status. Proposes a Directory.Build.targets with ErrorLog set from a SarifDir property, using version=2.1, and explains why it is not in Directory.Build.props (empty target framework) nor on the command line. Notes that the output folder must exist beforehand or every project fails with CS0016. After applying, builds with -p:SarifDir and confirms one file per project and target framework, and builds without it to confirm nothing is written. Does not claim the SARIF covers NuGet vulnerabilities. Hands the publishing to harness-ci-pipeline. Commits nothing."
     }
   ]
 }
