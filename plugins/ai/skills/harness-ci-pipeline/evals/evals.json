@@ -56,6 +56,20 @@
       "prompt": "Create the pipeline.",
       "setup": "Fictional repository 'acme-gateway' written in Go, hosted on GitHub.",
       "expected_output": "Finds no matching stack reference, says the stack is not supported yet, and writes no file."
+    },
+    {
+      "id": 9,
+      "name": "dotnet-github-sarif-code-scanning",
+      "prompt": "Quero que o CI publique os resultados da an\u00e1lise est\u00e1tica do .NET no code scanning do GitHub.",
+      "setup": "Fictional .NET solution 'Acme.Orders' hosted on GitHub with a working CI workflow that has 'permissions: contents: read'. Directory.Build.targets already sets ErrorLog from a SarifDir property. gh is available and logged in.",
+      "expected_output": "Checks that the wiring emits a .sarif path with version=2.1 before touching the workflow. Proposes a patch as a diff, not applied: the build step passes -p:SarifDir with a folder created beforehand, the SARIF folder is uploaded as an artifact with if-no-files-found set to error, and a separate publishing job with needs on the build job downloads it and uploads it to code scanning. The write permission (security-events) appears only in that job, and the build job keeps contents: read. Skips the publishing job for pull requests from forks. Resolves every new action version with gh and reads inputs from action.yml. States that publishing shows findings and does not fail the run, that code scanning availability depends on the repository plan, and that the snippet was not run on GitHub. Does not push or trigger a run."
+    },
+    {
+      "id": 10,
+      "name": "dotnet-azure-sarif-no-wiring",
+      "prompt": "Adiciona a publica\u00e7\u00e3o do SARIF no azure-pipelines.yml.",
+      "setup": "Fictional .NET solution 'Acme.Billing' hosted on Azure Repos with a pipeline that builds and tests. No Directory.Build.targets, no ErrorLog or SarifDir anywhere in the repository.",
+      "expected_output": "Checks the effective ErrorLog and finds it empty, so the project does not emit SARIF. Says so, does not add an ErrorLog argument to the pipeline to compensate, and points to harness-sensors for the wiring. Optionally describes the publishing step it would add afterwards (artifact named CodeAnalysisLogs, a check that fails when no .sarif file exists) and the other destinations, and states that the Azure file is not validated by a tool. Changes no file."
     }
   ]
 }

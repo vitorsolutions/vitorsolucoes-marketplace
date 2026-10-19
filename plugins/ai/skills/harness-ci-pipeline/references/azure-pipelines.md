@@ -119,11 +119,48 @@ Copy `scripts/assert_tests_ran.py` to a folder in the repository (for example `.
 
 Check that the hosted image has Python 3, and add the version-selection task (`UsePythonVersion@0`) if it does not.
 
-## 5. The linter
+## 5. SARIF publication (optional)
+
+Azure Pipelines has no built-in view for SARIF, so there are three destinations. Ask which one:
+
+- **Artifact named `CodeAnalysisLogs`** (default). The Microsoft documentation for the Microsoft Security DevOps extension says that Defender for Cloud monitors an artifact with this name for SARIF output, and that the optional SARIF SAST Scans Tab extension (installed on the organization by an administrator) shows SARIF results in the pipeline's Scans tab. Without either, the files are still downloadable from the run.
+- **GitHub Advanced Security for Azure DevOps**: the `AdvancedSecurity-Publish@1` task, with `SarifsInputDirectory` (an absolute path) and an optional `Category`. It needs that product enabled on the repository, and the task page describes it as working with the Infrastructure-as-Code scanning tasks, so confirm it accepts compiler SARIF before relying on it.
+- **Artifact with any other name**: the same as the first, without the integrations.
+
+Variables, build and publishing for the default destination (these replace the plain `dotnet build` line of the .NET stack steps and go after the test step):
+
+```yaml
+variables:
+  results: $(Agent.TempDirectory)/test-results
+  sarif: $(Agent.TempDirectory)/sarif
+
+      - script: mkdir -p "$(sarif)"
+        displayName: Create the SARIF folder
+      - script: dotnet build <solution> --no-restore --no-incremental -p:SarifDir="$(sarif)"
+        displayName: Build
+      # ... tests, count guard ...
+      - task: PublishBuildArtifacts@1
+        displayName: Publish SARIF
+        condition: succeededOrFailed()
+        inputs:
+          PathtoPublish: $(sarif)
+          ArtifactName: CodeAnalysisLogs
+      - script: test -n "$(find "$(sarif)" -name '*.sarif' -print -quit)"
+        displayName: Fail when no SARIF was written
+```
+
+Notes:
+
+- `PublishBuildArtifacts@1` is the task the Microsoft page uses for the `CodeAnalysisLogs` artifact, so it is used here instead of the `PublishPipelineArtifact@1` step of the skeleton. Whether the integrations also read a pipeline artifact of the same name was not checked.
+- The check runs after the publishing step on purpose: it fails the run without skipping the publication.
+- The folder lives under `Agent.TempDirectory`, outside the source tree, like the test results.
+- Paths inside the files are absolute paths of the agent. See the .NET stack file.
+
+## 6. The linter
 
 None was available. State that the file was **not validated** by a tool, and that the local run of its commands (section 7 of the skill workflow) is the only check performed.
 
-## 6. Pitfalls and limits
+## 7. Pitfalls and limits
 
 - **Branch policies** make a pipeline required before merging. They are set on the server. This skill does not change them.
 - **A task that publishes results automatically** (for example the .NET CLI task, for its own test command) makes a separate publishing step unnecessary or duplicated. Using `script` steps with the CLI, as in the skeleton, keeps the commands identical to the local ones, and needs the explicit publishing steps.
@@ -132,7 +169,7 @@ None was available. State that the file was **not validated** by a tool, and tha
 - **Task input names change between versions.** Read the documentation page for the version that you use.
 - **Templates and multi-stage pipelines** are outside this skill. The skeleton has one job.
 
-## 7. Verified on
+## 8. Verified on
 
 2026-10-12, against the Microsoft Learn documentation: `UseDotNet@2` (including `useGlobalJson`), `UsePythonVersion@0` (in the task list and in an example), `PublishTestResults@2` (inputs and the `VSTest` and `JUnit` formats), step conditions, the `script` and `bash` steps, the Ubuntu 24.04 image, and the pipeline-level `trigger`, `pr`, `pool` and job `timeoutInMinutes`. The commands of the .NET and Python templates were run locally in order (see the GitHub Actions reference).
 
@@ -141,5 +178,7 @@ The inputs used by the stack-step snippets (`UseDotNet@2`: `packageType`, `useGl
 Also checked against the documentation in a later pass: `PublishPipelineArtifact@1` inputs (`targetPath`, and `artifact`, whose alias is `artifactName`) and the `checkout` step (`self` is the default, `persistCredentials` is off by default).
 
 The `Agent.TempDirectory` predefined variable (a temporary folder cleaned after each job, used by tasks to hold test results before publishing) was read on Microsoft Learn on 2026-10-12. Using it as the `results` variable was not run on a server.
+
+Section 5 (SARIF publication) was written on 2026-10-19 from Microsoft Learn: the `CodeAnalysisLogs` artifact name, the `PublishBuildArtifacts@1` usage and the optional SARIF SAST Scans Tab extension (Microsoft Security DevOps extension page), and the `AdvancedSecurity-Publish@1` task with `SarifsInputDirectory` and `Category` (code scanning with third-party tools, and the task reference). The snippet was **not run on a server and not validated by a tool**.
 
 Not verified: the pipeline file itself on a server; Windows agents; templates; and the current task versions on any particular organization.

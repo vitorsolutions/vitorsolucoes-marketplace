@@ -13,6 +13,7 @@ A coding agent usually considers a task finished when its verification command e
 - Proposes changes as a plan, applies them one control at a time, and re-runs the verification command after each one.
 - Handles legacy code with a gradual mode that holds new code to the standard without blocking on old violations.
 - Confirms that each control really fails the command, or says it could not.
+- Optionally wires the compiler's SARIF output behind a switch that only CI sets, so findings can be published by `harness-ci-pipeline`. It is not a sensor and changes no exit status (.NET only).
 
 ## Supported stacks
 

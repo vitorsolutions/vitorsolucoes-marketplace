@@ -4,7 +4,8 @@ description: >-
   Creates or reviews the continuous integration pipeline so that it repeats the project's local
   definition of done on every change: the same locked install, build or lint, tests, and style
   commands, with no step that can fail silently, least-privilege access, a pinned toolchain and
-  runner, evidence kept as an artifact, and a guard that fails when a test run executed no tests.
+  runner, evidence kept as an artifact, publication of static-analysis results (SARIF) when the
+  project emits them, and a guard that fails when a test run executed no tests.
   Detects the CI host and the stack, reviews an existing pipeline against a checklist before
   proposing a patch, resolves action and task versions at generation time instead of from memory,
   validates the file with the host's linter where one exists, and runs the same commands locally.
@@ -28,6 +29,7 @@ Vocabulary:
 - **Locked install**: installing dependencies in a mode that fails if the lock file does not match the project.
 - **Silent failure**: a step whose failure does not fail the run, such as one marked to continue on error or one that ignores an exit status.
 - **Evidence**: result files kept as an artifact so a failure can be inspected.
+- **SARIF**: a standard file format for static-analysis results. Analyzers write it, and a code-scanning view or a pipeline tab reads it.
 
 ## Hard rules
 
@@ -35,7 +37,7 @@ Vocabulary:
 - Never put a secret, token, or credential in the file. Do not create secrets, and do not change repository or branch settings.
 - If the user pastes a token or credential into the conversation, do not repeat it, store it, or write it anywhere. Say it must be treated as exposed and rotated if it is real, that secrets belong in the host's secret store, and offer verification-only changes instead.
 - No step may fail silently: no continue-on-error, no `|| true`, no exit status that is thrown away.
-- Run with the minimum token permissions the job needs. For checking code, read access to the repository contents is enough.
+- Run with the minimum token permissions the job needs. For checking code, read access to the repository contents is enough. Publishing SARIF to a code-scanning view needs a write permission on the host: give it only to a separate job that runs no project code and receives the SARIF as an artifact, never to the job that builds and tests.
 - Never copy action or task versions from memory. Resolve them when you generate the file (see the host reference).
 - Never overwrite an existing pipeline file. Review it and propose a patch.
 - Never push, trigger a run, commit, or stage files.
@@ -67,6 +69,7 @@ Read it and report against this checklist, with evidence:
 | Permissions are minimal | Default tokens are often broader than needed |
 | Third-party steps are pinned (first-party ones follow the pinning policy the user chose) | A moving tag can change what runs |
 | Evidence is kept even on failure | The failure is when it matters |
+| Static-analysis results are published when the project emits SARIF, and the write permission is confined to the publishing job | Findings that stay in the log are not seen where reviewers look, and a write token in the build job is exposed to project code |
 | A time limit is set | A hung step should not run forever |
 
 Propose a patch for the gaps, as a diff shown in the reply and not applied. Do not rewrite the file. Any action or task version the patch adds or changes is resolved the same way as in step 5.1, and the first-party pinning policy is asked once (see the host reference), so the patch never carries a remembered version.
@@ -75,13 +78,16 @@ Propose a patch for the gaps, as a diff shown in the reply and not applied. Do n
 
 Ask about the triggers (which branches, pull requests), whether to cancel superseded runs, the retention of artifacts, and whether the pipeline should also run the architecture guard or the import checker if they exist. Defaults are in the host reference.
 
+If the project emits SARIF (the stack file says how to check), ask whether to publish it and where (the host reference lists the destinations). If it does not emit SARIF, say so and point to `harness-sensors`. Do not invent the build wiring inside the pipeline.
+
 ### 5. Generate
 
 Create the file from the host reference and the stack file:
 
 1. Resolve the current version of every action or task you use, following the host reference. If you cannot resolve it (no network or no tool), say so and ask the user for the version. Do not guess.
 2. Copy `scripts/assert_tests_ran.py` into the project (the host reference says where), unchanged, and wire it after the test step. It reads the test result files and fails when no test executed.
-3. Keep the commands identical to the local ones, except where the stack file explains a CI variant (the locked install, results output).
+3. Keep the commands identical to the local ones, except where the stack file explains a CI variant (the locked install, results output, the SARIF folder).
+4. If SARIF was chosen, add the build property, the artifact, the publishing job, and the check that fails when no file was written, from the host reference. Resolve any extra action or task the same way as in item 1.
 
 Show the file and wait for approval before writing.
 
@@ -106,6 +112,7 @@ Then list: the file created or the patch proposed, the versions resolved and how
 - **Pinned versions age.** Pinned third-party steps need someone to update them.
 - **Local and CI environments differ.** A command that passes locally can fail on the runner because of the operating system, the network, or the cache.
 - **The count guard checks that tests ran, not that they are good.**
+- **Publishing SARIF shows findings. It does not fail the run.** The build's exit status does that (see `harness-sensors`). A view that lists alerts blocks nothing until a branch rule uses it, and code scanning on private repositories may need a paid plan on the host.
 
 ## What a stack reference must contain
 
@@ -113,7 +120,7 @@ Each file in `references/stacks/` follows this outline:
 
 1. Detection markers
 2. The steps, in order, with the locked variant and the results output
-3. How the empty-run guard is fed (which result files)
+3. How the empty-run guard is fed (which result files), and how SARIF is produced when the stack supports it
 4. Pitfalls and limits
 5. Verified on (date, and what was not re-verified)
 
@@ -125,6 +132,7 @@ Each host file directly under `references/` follows this outline:
 2. How to resolve current versions of actions or tasks
 3. The skeleton: triggers, permissions, runner, limits, concurrency, evidence
 4. Where the guard script goes and how it is called
-5. The linter to run, or the statement that none was available
-6. Pitfalls and limits
-7. Verified on (date, and what was not re-verified)
+5. SARIF publication: the destinations, the permission each needs, and the check that fails when no file was written (or the statement that the host has no destination)
+6. The linter to run, or the statement that none was available
+7. Pitfalls and limits
+8. Verified on (date, and what was not re-verified)
