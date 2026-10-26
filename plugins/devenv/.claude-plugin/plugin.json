@@ -1,0 +1,6 @@
+{
+  "name": "devenv",
+  "version": "1.0.0",
+  "description": "Devenv plugin — skills that prepare the developer's local development environment, agnostic to the stack. devcontainer-setup assesses whether a repository and the host machine can run a Dev Container, reviews an existing configuration against the official specification, and creates or fixes one with confirmation.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}
