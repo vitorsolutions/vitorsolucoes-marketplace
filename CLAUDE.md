@@ -154,6 +154,17 @@ belongs to this plugin instead of a new domain.
 New security investigation skills belong to this domain. Run the helper tests from
 `plugins/security/skills/job-scam-investigator` with `python -m unittest discover -s tests -v`.
 
+- **devenv** — the development-environment domain: skills that prepare the developer's local
+  environment, agnostic to the stack. See `plugins/devenv/`. Skills:
+  - `devcontainer-setup` — assesses whether a repository and the host machine can run a Dev
+    Container, reviews an existing configuration against the official specification, and creates
+    or fixes one with confirmation. Sources of truth are containers.dev and the `devcontainers`
+    GitHub organization. Reports project fitness (fit / fit with caveats / not fit / undetermined)
+    and host fitness separately, never runs an existing configuration before reading it, never
+    writes secrets, and validates with the Dev Container CLI when available.
+
+Any new local-development-environment skill belongs to this plugin instead of a new domain.
+
 - **ticket-engineering** — the support-ticket domain: skills a developer runs from inside a
   codebase when picking up a ticket. Agnostic to the ticket system (no vendor or tool name is
   assumed — the ticket is read through whatever ticket tool the session exposes, or from pasted
