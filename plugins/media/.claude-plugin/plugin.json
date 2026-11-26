@@ -1,0 +1,6 @@
+{
+  "name": "media",
+  "version": "1.0.0",
+  "description": "Media plugin — skills that produce visual assets from inside an agent session. Starts with codex-image-generation: generate and edit raster images through the Codex CLI, using the user's own ChatGPT sign-in and configuration, with no API key.",
+  "author": { "name": "Vitor Soluções", "email": "contato@vitorsolucoes.com" }
+}
