@@ -1,0 +1,28 @@
+name: Codex Image Generation tests
+on:
+  push:
+    paths:
+      - 'plugins/media/**'
+      - '.github/workflows/codex-image-generation-tests.yml'
+  pull_request:
+    paths:
+      - 'plugins/media/**'
+      - '.github/workflows/codex-image-generation-tests.yml'
+permissions:
+  contents: read
+jobs:
+  unittest:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # Optional at run time; installed here so that the resize path is tested too.
+      - run: python -m pip install pillow==12.2.0
+      - run: python -m unittest discover -s tests -v
+        working-directory: plugins/media/skills/codex-image-generation

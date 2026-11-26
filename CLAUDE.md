@@ -188,3 +188,14 @@ Any new local-development-environment skill belongs to this plugin instead of a 
   ticket.
 
 Any new ticket-handling skill belongs to this plugin instead of a new domain.
+
+- **media** — the visual-asset domain: skills that produce images and other media files. See
+  `plugins/media/`. Skills:
+  - `codex-image-generation` — generates and edits raster images through the Codex CLI's built-in
+    image tool, using the user's ChatGPT sign-in and configuration. Never uses an API key or an
+    image API, runs Codex in a read-only sandbox, collects only the files of its own session, and
+    never overwrites a file. Ships a stdlib-only script (Pillow optional, for resizing) tested
+    against a fake `codex`, so the tests consume no plan usage. Run them from
+    `plugins/media/skills/codex-image-generation` with `python -m unittest discover -s tests -v`.
+
+Any new media-producing skill belongs to this plugin instead of a new domain.

@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin%20Marketplace-5A67D8?style=flat-square)](https://github.com/vitorsolutions/vitorsolucoes-marketplace)
-[![Plugins](https://img.shields.io/badge/plugins-7-2563eb?style=flat-square)](./plugins)
-[![Skills](https://img.shields.io/badge/skills-32-2563eb?style=flat-square)](./plugins)
+[![Plugins](https://img.shields.io/badge/plugins-8-2563eb?style=flat-square)](./plugins)
+[![Skills](https://img.shields.io/badge/skills-33-2563eb?style=flat-square)](./plugins)
 
 A [Claude Code](https://claude.com/claude-code) plugin marketplace maintained by **Vitor
 Soluções**, following the official plugin marketplace format. Each domain is an independent
@@ -25,7 +25,8 @@ with nothing duplicated by hand.
 │   ├── ai/                           # AI-tooling domain: agent-creator
 │   ├── security/                     # job-offer fraud investigation
 │   ├── devenv/                       # local development environment: devcontainer-setup
-│   └── ticket-engineering/           # support-ticket domain: triage, investigation, diagnosis, response
+│   ├── ticket-engineering/           # support-ticket domain: triage, investigation, diagnosis, response
+│   └── media/                        # visual assets: image generation through the Codex CLI
 ├── catalog/                          # Astro catalog site (pure projection of the repo)
 ├── LICENSE
 ├── CLAUDE.md                         # repo guide for Claude Code
@@ -43,6 +44,7 @@ with nothing duplicated by hand.
 | [`security`](./plugins/security) | Security domain. Bundles `job-scam-investigator` for evidence-led job-offer risk assessment, passive verification, exposure triage, and offline indicator extraction. |
 | [`devenv`](./plugins/devenv) | Local development environment domain, agnostic to the stack. Bundles `devcontainer-setup` (assesses whether a repository and the host machine can run a Dev Container, reviews an existing configuration against the official specification, and creates or fixes one with confirmation, validating with the Dev Container CLI; reports project fitness and host fitness separately and never runs an existing configuration before reading it). |
 | [`ticket-engineering`](./plugins/ticket-engineering) | Support-ticket domain, for a developer picking up a ticket from inside the codebase it concerns. Bundles `ticket-triage` (classifies the ticket as incident, question, improvement, or request, judges whether it has enough information, and names the next step), `ticket-investigation` (gathers facts from the code with file:line references, without concluding a cause), `ticket-diagnosis` (type-aware conclusion with every claim graded Observed/Hypothesis/Risk/Recommendation, declaring "inconclusive" rather than fabricating a cause), and `ticket-response` (drafts the requester-facing reply free of internal detail, sending it only on request and after explicit confirmation). Agnostic to the ticket system and to the stack; read-only, with state kept in the conversation. |
+| [`media`](./plugins/media) | Visual asset domain. Bundles `codex-image-generation` (generates and edits raster images from inside an agent session through the Codex CLI's built-in image tool, using the user's own ChatGPT sign-in and configuration and no API key; runs Codex in a read-only sandbox, collects only the files of its own session, and never overwrites a file). Requires the Codex CLI and Python 3.9+; Pillow only for exact final sizes. |
 
 ## Installing skills
 
@@ -79,6 +81,10 @@ npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/devenv/skills --
 
 ```bash
 npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/ticket-engineering/skills --full-depth
+```
+
+```bash
+npx skills add vitorsolutions/vitorsolucoes-marketplace/plugins/media/skills --full-depth
 ```
 
 Or install one specific skill by name:

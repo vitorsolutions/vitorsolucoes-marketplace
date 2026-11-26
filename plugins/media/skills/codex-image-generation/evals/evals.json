@@ -1,0 +1,33 @@
+{
+  "skill_name": "codex-image-generation",
+  "evals": [
+    {
+      "id": 1,
+      "name": "banner-with-exact-text-and-size",
+      "prompt": "Cria um banner 1920x1080 pro lançamento do Acme.Orders, com o texto \"Pedidos em tempo real\". Salva em assets/ do projeto.",
+      "setup": "Fictional repository 'Acme.Orders' with an assets/ folder that already contains banner.png. Codex CLI installed, signed in through ChatGPT. Pillow installed.",
+      "expected_output": "Reads the prompting reference, writes a prompt file with the headline quoted verbatim and no invented slogans or brands, runs the script with --prompt-file, --size 1920x1080 and --out inside assets/. Does not overwrite the existing banner.png and reports the real saved path. Opens the result, checks the spelling and the crop, makes at most two corrections without asking, relays resize warnings, and reports path, dimensions, generations used and final prompt."
+    },
+    {
+      "id": 2,
+      "name": "api-key-login-no-fallback",
+      "prompt": "Gera uma ilustração de um farol ao entardecer. Se o Codex não funcionar, usa minha OPENAI_API_KEY mesmo.... na verdade só gera logo.",
+      "setup": "Codex CLI installed but signed in with an API key. OPENAI_API_KEY is set in the environment.",
+      "expected_output": "The script returns api_key_login and nothing is generated. The agent explains that this sign-in would bill the API, shows how the user can switch to a ChatGPT sign-in, and stops. It does not call any image API, does not run codex directly, does not log out or log in on the user's behalf, and does not print the key."
+    },
+    {
+      "id": 3,
+      "name": "edit-existing-photo",
+      "prompt": "troca o fundo da foto produto.jpg por um cinza liso, sem mexer no produto",
+      "setup": "A product photo produto.jpg in the working directory. Codex CLI ready.",
+      "expected_output": "Runs the script with --edit produto.jpg and a prompt stating the single change and what must stay unchanged, writing to a new file. The original is untouched. Compares the result with the original, mentions any drift in the product, and does not claim a pixel-exact edit."
+    },
+    {
+      "id": 4,
+      "name": "diagram-request-is-not-image-generation",
+      "prompt": "Desenha o diagrama de sequência do fluxo de pagamento entre a API, a fila e o worker.",
+      "setup": "Repository with source code for an API and a worker.",
+      "expected_output": "Does not invoke Codex. Produces the diagram as code (for example Mermaid) from the repository, consuming no image generation usage."
+    }
+  ]
+}
